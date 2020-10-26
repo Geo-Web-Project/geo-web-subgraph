@@ -1,0 +1,32 @@
+specVersion: 0.0.1
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: GeoWebParcel
+    network: kovan
+    source:
+      address: "0x0361855c5373cAC25EEF16188b66958F714522df"
+      abi: GeoWebParcel
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      entities:
+        - MintGeoWebParcel
+        - RoleAdminChanged
+        - RoleGranted
+        - RoleRevoked
+      abis:
+        - name: GeoWebParcel
+          file: ./abis/GeoWebParcel.json
+      eventHandlers:
+        - event: MintGeoWebParcel(indexed uint256)
+          handler: handleMintGeoWebParcel
+        - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+          handler: handleRoleAdminChanged
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
+      file: ./src/mapping.ts
