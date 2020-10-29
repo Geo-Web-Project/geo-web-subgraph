@@ -1,34 +1,61 @@
 import { BigInt } from "@graphprotocol/graph-ts"
+import { GeoWebCoordinate } from "as-geo-web-coordinate/assembly"
 import {
   GeoWebParcel,
-  MintGeoWebParcel,
-  RoleAdminChanged,
-  RoleGranted,
-  RoleRevoked
+  MintGeoWebParcel
 } from "../generated/GeoWebParcel/GeoWebParcel"
-import { ExampleEntity } from "../generated/schema"
+import { LandParcel, GeoJSONPolygon, GeoJSONCoordinate } from "../generated/schema"
+import { BigDecimal } from '@graphprotocol/graph-ts'
+import { log } from '@graphprotocol/graph-ts'
 
 export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+  let entity = LandParcel.load(event.params._id.toHex())
+  let polygonEntity = GeoJSONPolygon.load(event.params._id.toHex())
 
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
   if (entity == null) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
+    entity = new LandParcel(event.params._id.toHex())
   }
 
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
+  if (polygonEntity == null) {
+    polygonEntity = new GeoJSONPolygon(event.params._id.toHex())
+  }
 
-  // Entity fields can be set based on event parameters
-  entity._id = event.params._id
+  let contract = GeoWebParcel.bind(event.address)
+  let parcel = contract.getLandParcel(event.params._id)
+  
+  let coords = GeoWebCoordinate.to_gps_hex(parcel.value0.toHex()).map<BigDecimal[]>((v1: string[]) => {
+    return v1.map<BigDecimal>((v2: string) => {
+      return BigDecimal.fromString(v2)
+    })
+  })
 
-  // Entities can be written to the store with `.save()`
+  let coordIDs = new Array<string>(coords.length)
+
+  for (let i = 0; i < coords.length; i++) {
+    let coord = coords[i];
+    let coordID = coord[0].toString() + ";" + coord[1].toString()
+    let coordinateEntity = GeoJSONCoordinate.load(coordID)
+    if (coordinateEntity == null) {
+      coordinateEntity = new GeoJSONCoordinate(coordID)
+    }
+
+    coordinateEntity.lon = coord[0]
+    coordinateEntity.lat = coord[1]
+
+    coordIDs[i] = coordinateEntity.id
+    coordinateEntity.save()
+  }
+  
+  polygonEntity.type = "Polygon"
+  polygonEntity.coordinates = coordIDs
+
+  entity.polygon = polygonEntity.id
+  
+  polygonEntity.save()
   entity.save()
 
   // Note: If a handler doesn't require existing field values, it is faster
@@ -55,9 +82,3 @@ export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   // - contract.hasRole(...)
   // - contract.getLandParcel(...)
 }
-
-export function handleRoleAdminChanged(event: RoleAdminChanged): void {}
-
-export function handleRoleGranted(event: RoleGranted): void {}
-
-export function handleRoleRevoked(event: RoleRevoked): void {}

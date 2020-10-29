@@ -1,5 +1,20 @@
-type ExampleEntity @entity {
+type LandParcel @entity {
   id: ID!
-  count: BigInt!
-  _id: BigInt! # uint256
+  polygon: GeoJSONPolygon!
+}
+
+enum GeoJSONType {
+  Polygon
+}
+
+type GeoJSONPolygon @entity {
+  id: ID!
+  type: GeoJSONType!
+  coordinates: [GeoJSONCoordinate!]
+}
+
+type GeoJSONCoordinate @entity {
+  id: ID!
+  lon: BigDecimal!
+  lat: BigDecimal!
 }
