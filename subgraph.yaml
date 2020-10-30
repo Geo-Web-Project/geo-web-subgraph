@@ -8,6 +8,7 @@ dataSources:
     source:
       address: "0x6CC6d2ba9668d5F8F5D08A45520E935cD6CDfc6f"
       abi: GeoWebParcel
+      startBlock: 21794563
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
