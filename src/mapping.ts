@@ -27,7 +27,7 @@ export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   let contract = GeoWebParcel.bind(event.address)
   let parcel = contract.getLandParcel(event.params._id)
   
-  let coords = GeoWebCoordinate.to_gps_hex(parcel.value0.toHex()).map<BigDecimal[]>((v1: string[]) => {
+  let coords = GeoWebCoordinate.to_gps_hex(parcel.value0.toHex().slice(2)).map<BigDecimal[]>((v1: string[]) => {
     return v1.map<BigDecimal>((v2: string) => {
       return BigDecimal.fromString(v2)
     })
