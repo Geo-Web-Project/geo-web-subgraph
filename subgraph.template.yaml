@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: GeoWebParcel
-    network: kovan
+    network: "{{network}}"
     source:
-      address: "0x6CC6d2ba9668d5F8F5D08A45520E935cD6CDfc6f"
+      address: "{{address}}"
       abi: GeoWebParcel
-      startBlock: 21794563
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
