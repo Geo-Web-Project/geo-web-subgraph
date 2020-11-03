@@ -1,10 +1,19 @@
 type LandParcel @entity {
   id: ID!
-  polygon: GeoJSONPolygon!
+  type: GeoJSONType!
+  geometry: GeoJSONMultiPolygon!
 }
 
 enum GeoJSONType {
+  Feature
+  MultiPolygon
   Polygon
+}
+
+type GeoJSONMultiPolygon @entity {
+  id: ID!
+  type: GeoJSONType!
+  coordinates: [GeoJSONPolygon!]
 }
 
 type GeoJSONPolygon @entity {
