@@ -6,6 +6,7 @@ import {
 } from "../generated/GeoWebParcel/GeoWebParcel"
 import { LandParcel, GeoJSONMultiPolygon, GeoJSONPolygon, GeoJSONCoordinate } from "../generated/schema"
 import { BigDecimal } from '@graphprotocol/graph-ts'
+import { log } from '@graphprotocol/graph-ts'
 
 export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -34,10 +35,10 @@ export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   let coordIDs = new Array<string>(numPaths*124)
 
   let currentCoord = <u64>Number.parseInt(parcel.value0.toHex().slice(2), 16)
-  let currentPath: u256
+  let currentPath: u256 = new u256(0)
   let p_i = 0
   let i = 0
-  if (numPaths > 0) {
+  if (numPaths > 0 && !paths[p_i].isZero()) {
     currentPath = u256.fromUint8ArrayLE(paths[p_i])
   }
   do {
