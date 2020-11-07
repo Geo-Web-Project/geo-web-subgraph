@@ -19,7 +19,10 @@ type GeoJSONMultiPolygon @entity {
 type GeoJSONPolygon @entity {
   id: ID!
   type: GeoJSONType!
-  coordinates: [GeoJSONCoordinate!]
+  pointBL: GeoJSONCoordinate!
+  pointBR: GeoJSONCoordinate!
+  pointTR: GeoJSONCoordinate!
+  pointTL: GeoJSONCoordinate!
 }
 
 type GeoJSONCoordinate @entity {

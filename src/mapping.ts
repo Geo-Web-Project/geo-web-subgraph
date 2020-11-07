@@ -85,8 +85,6 @@ function savePolygon(gwCoord: u64): void {
     return BigDecimal.fromString(v.toString())
   })
 
-  let coordIDs = new Array<string>(coords.length)
-
   for (let i = 0; i < coords.length; i += 2) {
     let lon = coords[i];
     let lat = coords[i+1];
@@ -99,10 +97,22 @@ function savePolygon(gwCoord: u64): void {
     coordinateEntity.lon = lon
     coordinateEntity.lat = lat
 
-    coordIDs[i] = coordinateEntity.id
+    switch (i) {
+      case 0:
+        polygonEntity.pointBL = coordinateEntity.id
+        break;
+      case 2:
+        polygonEntity.pointBR = coordinateEntity.id
+        break;
+      case 4:
+        polygonEntity.pointTR = coordinateEntity.id
+        break;
+      case 6:
+        polygonEntity.pointTL = coordinateEntity.id
+        break;
+    }
     coordinateEntity.save()
   }
   
-  polygonEntity.coordinates = coordIDs
   polygonEntity.save()
 }
