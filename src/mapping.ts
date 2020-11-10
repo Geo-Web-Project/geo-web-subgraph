@@ -1,12 +1,12 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { Address, BigInt } from "@graphprotocol/graph-ts"
 import { DirectionPath, GeoWebCoordinate, GeoWebCoordinatePath, u256 } from "as-geo-web-coordinate/assembly"
 import {
   GeoWebParcel,
   MintGeoWebParcel
 } from "../generated/GeoWebParcel/GeoWebParcel"
-import { LandParcel, GeoJSONMultiPolygon, GeoJSONPolygon, GeoJSONCoordinate } from "../generated/schema"
+import { ERC721License, LandParcel, GeoJSONMultiPolygon, GeoJSONPolygon, GeoJSONCoordinate } from "../generated/schema"
 import { BigDecimal } from '@graphprotocol/graph-ts'
-import { log } from '@graphprotocol/graph-ts'
+import { Transfer } from "../generated/ERC721License/ERC721License"
 
 export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -19,6 +19,7 @@ export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   if (entity == null) {
     entity = new LandParcel(event.params._id.toHex())
     entity.type = "Feature"
+    entity.license = event.params._id.toHex()
   }
 
   if (multiPolyEntity == null) {
@@ -115,4 +116,16 @@ function savePolygon(gwCoord: u64): void {
   }
   
   polygonEntity.save()
+}
+
+export function handleLicenseTransfer(event: Transfer): void {
+  let entity = ERC721License.load(event.params.tokenId.toHex())
+
+  if (entity == null) {
+    entity = new ERC721License(event.params.tokenId.toHex())
+  }
+
+  entity.owner = event.params.to
+  entity.landParcel = event.params.tokenId.toHex()
+  entity.save()
 }
