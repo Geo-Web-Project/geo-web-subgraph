@@ -6,9 +6,9 @@ dataSources:
     name: GeoWebParcel
     network: "{{network}}"
     source:
-      address: "{{address}}"
+      address: "{{parcelAddress}}"
       abi: GeoWebParcel
-      startBlock: {{startBlock}}
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -21,4 +21,24 @@ dataSources:
       eventHandlers:
         - event: MintGeoWebParcel(indexed uint256)
           handler: handleMintGeoWebParcel
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: ERC721License
+    network: "{{network}}"
+    source:
+      address: "{{licenseAddress}}"
+      abi: ERC721License
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - ERC721License
+      abis:
+        - name: ERC721License
+          file: ./abis/ERC721License.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleLicenseTransfer
       file: ./src/mapping.ts

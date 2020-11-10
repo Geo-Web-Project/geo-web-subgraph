@@ -1,5 +1,12 @@
+type ERC721License @entity {
+  id: ID!
+  owner: Bytes!
+  landParcel: LandParcel!
+}
+
 type LandParcel @entity {
   id: ID!
+  license: ERC721License!
   type: GeoJSONType!
   geometry: GeoJSONMultiPolygon!
 }
