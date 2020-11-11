@@ -1,6 +1,7 @@
 {
     "network": "kovan",
-    "parcelAddress": "0xD0bd2c8d531AbB02F455E1fB2567B1115aB842Fe",
-    "licenseAddress": "0xB4690180d9a34Dd67CCcA8d45F8154a448584815",
-    "startBlock": 21794563
+    "adminAddress": "0xa2328e6dDE846b98333701A5CcF51B31062ac201",
+    "parcelAddress": "0x7Ca5E1ECCde40E02982078878d4A331DdfF910FA",
+    "licenseAddress": "0xadF66B3be16E91D29EF1667603204C8C78B43bBc",
+    "startBlock": 22044467
 }

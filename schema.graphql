@@ -1,7 +1,9 @@
 type ERC721License @entity {
   id: ID!
-  owner: Bytes!
-  landParcel: LandParcel!
+  owner: Bytes
+  value: BigInt
+  expirationTimestamp: BigInt
+  landParcel: LandParcel
 }
 
 type LandParcel @entity {

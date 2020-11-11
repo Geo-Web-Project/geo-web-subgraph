@@ -3,6 +3,26 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
+    name: GeoWebAdmin
+    network: "{{network}}"
+    source:
+      address: "{{adminAddress}}"
+      abi: GeoWebAdmin
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - ERC721License
+      abis:
+        - name: GeoWebAdmin
+          file: ./abis/GeoWebAdmin.json
+      eventHandlers:
+        - event: LicenseInfoUpdated(indexed uint256,uint256,uint256)
+          handler: handleLicenseInfoUpdated
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
     name: GeoWebParcel
     network: "{{network}}"
     source:

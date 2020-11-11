@@ -7,6 +7,7 @@ import {
 import { ERC721License, LandParcel, GeoJSONMultiPolygon, GeoJSONPolygon, GeoJSONCoordinate } from "../generated/schema"
 import { BigDecimal } from '@graphprotocol/graph-ts'
 import { Transfer } from "../generated/ERC721License/ERC721License"
+import { LicenseInfoUpdated } from "../generated/GeoWebAdmin/GeoWebAdmin"
 
 export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -127,5 +128,17 @@ export function handleLicenseTransfer(event: Transfer): void {
 
   entity.owner = event.params.to
   entity.landParcel = event.params.tokenId.toHex()
+  entity.save()
+}
+
+export function handleLicenseInfoUpdated(event: LicenseInfoUpdated): void {
+  let entity = ERC721License.load(event.params._licenseId.toHex())
+
+  if (entity == null) {
+    entity = new ERC721License(event.params._licenseId.toHex())
+  }
+
+  entity.value = event.params.value
+  entity.expirationTimestamp = event.params.expirationTimestamp
   entity.save()
 }
