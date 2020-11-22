@@ -222,10 +222,10 @@ argparse@^1.0.7:
   dependencies:
     sprintf-js "~1.0.2"
 
-as-geo-web-coordinate@^0.5.5:
-  version "0.5.5"
-  resolved "https://registry.yarnpkg.com/as-geo-web-coordinate/-/as-geo-web-coordinate-0.5.5.tgz#5dd8a3a6b0780049e83d72bedd7d3f3997f79c37"
-  integrity sha512-zeCGTatpp9ye6yHLwEdHqjsg4GKrTP0xKilD73FRYxXANNhvpgWH58MGh9ah31Q0zj9zmBWieJ2Ug6W2ZSI/jg==
+as-geo-web-coordinate@^0.5.6:
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/as-geo-web-coordinate/-/as-geo-web-coordinate-0.5.6.tgz#2c835dcace87cf0cecb0ca547a87618569ad6a1a"
+  integrity sha512-g5TbH/+OE84nnRVryBXwoPTqlGZHp1I1879WP+hqi9tCJxM1e0HQJBtnKkKJoDmDLG9jEG6Yc58uHm479BNIWw==
   dependencies:
     "@assemblyscript/loader" "^0.17.0"
 
