@@ -14,7 +14,7 @@
   "dependencies": {
     "@graphprotocol/graph-cli": "0.19.0",
     "@graphprotocol/graph-ts": "0.19.0",
-    "as-geo-web-coordinate": "^0.5.6",
+    "as-geo-web-coordinate": "^0.5.7",
     "mustache": "^3.1.0"
   }
 }
