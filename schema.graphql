@@ -9,32 +9,19 @@ type ERC721License @entity {
 type LandParcel @entity {
   id: ID!
   license: ERC721License!
-  type: GeoJSONType!
-  geometry: GeoJSONMultiPolygon!
+  coordinates: [GeoWebCoordinate!]
 }
 
-enum GeoJSONType {
-  Feature
-  MultiPolygon
-  Polygon
-}
-
-type GeoJSONMultiPolygon @entity {
+type GeoWebCoordinate @entity {
   id: ID!
-  type: GeoJSONType!
-  coordinates: [GeoJSONPolygon!]
+  landParcel: LandParcel!
+  pointBL: GeoPoint!
+  pointBR: GeoPoint!
+  pointTR: GeoPoint!
+  pointTL: GeoPoint!
 }
 
-type GeoJSONPolygon @entity {
-  id: ID!
-  type: GeoJSONType!
-  pointBL: GeoJSONCoordinate!
-  pointBR: GeoJSONCoordinate!
-  pointTR: GeoJSONCoordinate!
-  pointTL: GeoJSONCoordinate!
-}
-
-type GeoJSONCoordinate @entity {
+type GeoPoint @entity {
   id: ID!
   lon: BigDecimal!
   lat: BigDecimal!
