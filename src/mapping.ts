@@ -51,7 +51,7 @@ export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
     currentPath = u256.fromUint8ArrayLE(paths[p_i]);
   }
   do {
-    saveGWCoord(currentCoord, landParcelEntity.id);
+    saveGWCoord(currentCoord, landParcelEntity.id, event);
     coordIDs[i] = currentCoord.toString();
     i += 1;
 
@@ -82,7 +82,7 @@ export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   landParcelEntity.save();
 }
 
-function saveGWCoord(gwCoord: u64, landParcelID: string): void {
+function saveGWCoord(gwCoord: u64, landParcelID: string, event: MintGeoWebParcel): void {
   let entity = GWCoord.load(gwCoord.toString());
 
   if (entity == null) {
@@ -123,6 +123,7 @@ function saveGWCoord(gwCoord: u64, landParcelID: string): void {
   }
 
   entity.landParcel = landParcelID;
+  entity.createdAtBlock = event.block.number;
   // TODO: Index x and y
   // entity.x = BigInt.fromUnsignedBytes(
   //   ByteArray.fromHexString(GeoWebCoordinate.get_x(gwCoord).toString(16))
