@@ -15,6 +15,7 @@ type LandParcel @entity {
 type GeoWebCoordinate @entity {
   id: ID!
   landParcel: LandParcel!
+  createdAtBlock: BigInt!
   pointBL: GeoPoint!
   pointBR: GeoPoint!
   pointTR: GeoPoint!
