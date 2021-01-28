@@ -20,7 +20,7 @@ import {
   GeoWebCoordinate as GWCoord,
   GeoPoint,
 } from "../generated/schema";
-import { Transfer } from "../generated/ERC721License/ERC721License";
+import { Transfer, RootContentCIDUpdated, RootContentCIDRemoved } from "../generated/ERC721License/ERC721License";
 import { LicenseInfoUpdated } from "../generated/GeoWebAdmin/GeoWebAdmin";
 
 export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
@@ -155,5 +155,27 @@ export function handleLicenseInfoUpdated(event: LicenseInfoUpdated): void {
 
   entity.value = event.params.value;
   entity.expirationTimestamp = event.params.expirationTimestamp;
+  entity.save();
+}
+
+export function handleRootCIDUpdated(event: RootContentCIDUpdated): void {
+  let entity = ERC721License.load(event.params.tokenId.toHex());
+
+  if (entity == null) {
+    entity = new ERC721License(event.params.tokenId.toHex());
+  }
+
+  entity.rootCID = event.params.rootContent;
+  entity.save();
+}
+
+export function handleRootCIDRemoved(event: RootContentCIDRemoved): void {
+  let entity = ERC721License.load(event.params.tokenId.toHex());
+
+  if (entity == null) {
+    entity = new ERC721License(event.params.tokenId.toHex());
+  }
+
+  entity.rootCID = "";
   entity.save();
 }

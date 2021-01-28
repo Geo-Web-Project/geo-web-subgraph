@@ -61,4 +61,8 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleLicenseTransfer
+        - event: RootContentCIDUpdated(indexed uint256,string)
+          handler: handleRootCIDUpdated
+        - event: RootContentCIDRemoved(indexed uint256)
+          handler: handleRootCIDRemoved
       file: ./src/mapping.ts

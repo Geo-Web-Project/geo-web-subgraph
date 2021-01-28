@@ -3,6 +3,7 @@ type ERC721License @entity {
   owner: Bytes
   value: BigInt
   expirationTimestamp: BigInt
+  rootCID: String
   landParcel: LandParcel
 }
 
