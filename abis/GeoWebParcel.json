@@ -109,8 +109,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -123,8 +122,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -148,8 +146,31 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "getLandParcel",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "baseCoordinate",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "path",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -168,8 +189,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -193,8 +213,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -213,8 +232,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -256,8 +274,31 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "baseCoordinate",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "path",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "mintLandParcel",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newParcelId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [
@@ -294,54 +335,5 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint64",
-        "name": "baseCoordinate",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "path",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "mintLandParcel",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "newParcelId",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      }
-    ],
-    "name": "getLandParcel",
-    "outputs": [
-      {
-        "internalType": "uint64",
-        "name": "baseCoordinate",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "path",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
   }
 ]

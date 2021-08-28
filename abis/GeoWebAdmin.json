@@ -70,8 +70,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -90,8 +89,40 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint64",
+        "name": "baseCoordinate",
+        "type": "uint64"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "path",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "initialValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "ceramicDocId",
+        "type": "string"
+      }
+    ],
+    "name": "claim",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -104,14 +135,28 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
         "name": "_minInitialValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_minClaimExpiration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_minExpiration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxExpiration",
         "type": "uint256"
       },
       {
@@ -146,8 +191,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -171,8 +215,46 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxExpiration",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minClaimExpiration",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minExpiration",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -185,8 +267,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -199,8 +280,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -213,8 +293,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -233,8 +312,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -247,8 +325,7 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [],
@@ -261,8 +338,35 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "licenseId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxPurchasePrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "newValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "ceramicDocId",
+        "type": "string"
+      }
+    ],
+    "name": "purchaseLicense",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -339,40 +443,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint64",
-        "name": "baseCoordinate",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "path",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "initialValue",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "ceramicDocId",
-        "type": "string"
-      }
-    ],
-    "name": "claim",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function",
-    "payable": true
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "licenseId",
         "type": "uint256"
@@ -386,37 +456,7 @@
     "name": "updateValue",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function",
-    "payable": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "licenseId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "maxPurchasePrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newValue",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "ceramicDocId",
-        "type": "string"
-      }
-    ],
-    "name": "purchaseLicense",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function",
-    "payable": true
+    "type": "function"
   },
   {
     "inputs": [],
