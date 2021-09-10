@@ -4,7 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service Geo-Web-Project/geo-web-arbitrum-rinkeby",
+    "deploy": "graph deploy --product hosted-service Geo-Web-Project/geo-web-rinkeby-subgraph",
     "create-local": "graph create --node http://localhost:8020/ Geo-Web-Project/geo-web-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ Geo-Web-Project/geo-web-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 Geo-Web-Project/geo-web-subgraph",
@@ -12,6 +12,7 @@
     "prepare:arbitrum-rinkeby": "mustache config/arbitrum-rinkeby.json subgraph.template.yaml > subgraph.yaml",
     "prepare:sokul": "mustache config/sokul.json subgraph.template.yaml > subgraph.yaml",
     "prepare:xdai": "mustache config/xdai.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:rinkeby": "mustache config/rinkeby.json subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml"
   },
   "dependencies": {

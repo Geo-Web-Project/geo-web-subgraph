@@ -1,0 +1,7 @@
+{
+    "network": "rinkeby",
+    "adminAddress": "0x57da7C6E90d0f4617a4498cF338130818C93400b",
+    "parcelAddress": "0x40e21849492Dc88386382755C6648fc7F945d37D",
+    "licenseAddress": "0xD7403e9a7E80ec3cb87182c8c664A609dF21041A",
+    "startBlock": 9269297
+}
