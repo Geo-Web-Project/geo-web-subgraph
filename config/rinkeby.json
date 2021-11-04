@@ -1,7 +1,8 @@
 {
     "network": "rinkeby",
-    "adminAddress": "0x57da7C6E90d0f4617a4498cF338130818C93400b",
-    "parcelAddress": "0x40e21849492Dc88386382755C6648fc7F945d37D",
-    "licenseAddress": "0xD7403e9a7E80ec3cb87182c8c664A609dF21041A",
-    "startBlock": 9269297
+    "accountantAddress": "0x45fdCbcAaBE80b630d83a0f5a0Fb4a8b9cEFf84E",
+    "parcelAddress": "0x36Cf448d15Dbf4365c7421FA94dBEC93B95720E4",
+    "licenseAddress": "0xF2282541d384D6d9A5C9B02D020fDFededd8D827",
+    "collectorAddress": "0x8C6e0d49ca34fd262B209509F32aE4eC8D04F9eE",
+    "startBlock": 9586861
 }
