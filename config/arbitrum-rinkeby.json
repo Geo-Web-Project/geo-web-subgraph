@@ -1,7 +1,7 @@
 {
     "network": "arbitrum-rinkeby",
-    "adminAddress": "0xa194ff1b55f6409C0b1a03235398A3342b3374Ae",
-    "parcelAddress": "0xb4492cAE235FD27a10E227F72C58Bc3ECbE2025F",
-    "licenseAddress": "0xE24Fa8e9E78E0FFE760649Eb0C381a17929E5F1c",
+    "adminAddress": "0x40e21849492Dc88386382755C6648fc7F945d37D",
+    "parcelAddress": "0xc7e75618Fb3518EA5dC0fd00accdCb66192e8813",
+    "licenseAddress": "0x00ff2297FFA4f01f61446DB33E093A631301D11c",
     "startBlock": 0
 }
