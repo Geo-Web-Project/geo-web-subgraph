@@ -155,14 +155,14 @@ export function handleLicenseTransfer(event: Transfer): void {
 }
 
 export function handleBidEvent(event: ethereum.Event): void {
-  let entity = ERC721License.load(event.params._licenseId.toHex());
+  let entity = ERC721License.load(event.parameters[0].value.toBigInt().toHex());
 
   if (entity == null) {
-    entity = new ERC721License(event.params._licenseId.toHex());
+    entity = new ERC721License(event.parameters[0].value.toBigInt().toHex());
   }
 
   let contract = AuctionSuperApp.bind(event.address);
-  let bid = contract.currentOwnerBid(event.params._licenseId);
+  let bid = contract.currentOwnerBid(event.parameters[0].value.toBigInt());
 
   entity.contributionRate = bid.value2;
   entity.perSecondFeeNumerator = bid.value3;
