@@ -1,28 +1,31 @@
 import {
+  ethereum,
   Address,
   BigInt,
   BigDecimal,
-  ByteArray,
+  ByteArray
 } from "@graphprotocol/graph-ts";
 import {
   DirectionPath,
   GeoWebCoordinate,
   GeoWebCoordinatePath,
-  u256,
+  u256
 } from "as-geo-web-coordinate/assembly";
 import {
   GeoWebParcel,
-  ParcelBuilt,
+  ParcelBuilt
 } from "../generated/GeoWebParcel/GeoWebParcel";
 import {
   ERC721License,
   LandParcel,
   GeoWebCoordinate as GWCoord,
-  GeoPoint,
+  GeoPoint
 } from "../generated/schema";
 import { Transfer } from "../generated/ERC721License/ERC721License";
-import { ContributionRateUpdated } from "../generated/Accountant/Accountant";
-import { LicenseExpirationUpdated } from "../generated/ETHExpirationCollector/ETHExpirationCollector";
+import {
+  AuctionSuperApp,
+  BidPlaced
+} from "../generated/AuctionSuperApp/AuctionSuperApp";
 
 export function handleParcelBuilt(event: ParcelBuilt): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -83,7 +86,11 @@ export function handleParcelBuilt(event: ParcelBuilt): void {
   landParcelEntity.save();
 }
 
-function saveGWCoord(gwCoord: u64, landParcelID: string, event: ParcelBuilt): void {
+function saveGWCoord(
+  gwCoord: u64,
+  landParcelID: string,
+  event: ParcelBuilt
+): void {
   let entity = GWCoord.load(gwCoord.toString());
 
   if (entity == null) {
@@ -147,24 +154,19 @@ export function handleLicenseTransfer(event: Transfer): void {
   entity.save();
 }
 
-export function handleContributionRateUpdated(event: ContributionRateUpdated): void {
-  let entity = ERC721License.load(event.params.id.toHex());
+export function handleBidEvent(event: ethereum.Event): void {
+  let entity = ERC721License.load(event.params._licenseId.toHex());
 
   if (entity == null) {
-    entity = new ERC721License(event.params.id.toHex());
+    entity = new ERC721License(event.params._licenseId.toHex());
   }
 
-  entity.contributionRate = event.params.newRate;
-  entity.save();
-}
+  let contract = AuctionSuperApp.bind(event.address);
+  let bid = contract.currentOwnerBid(event.params._licenseId);
 
-export function handleLicenseExpirationUpdated(event: LicenseExpirationUpdated): void {
-  let entity = ERC721License.load(event.params.licenseId.toHex());
-
-  if (entity == null) {
-    entity = new ERC721License(event.params.licenseId.toHex());
-  }
-
-  entity.expirationTimestamp = event.params.newExpirationTimestamp;
+  entity.contributionRate = bid.value2;
+  entity.perSecondFeeNumerator = bid.value3;
+  entity.perSecondFeeDenominator = bid.value4;
+  entity.forSalePrice = bid.value5;
   entity.save();
 }

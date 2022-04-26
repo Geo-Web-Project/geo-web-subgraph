@@ -3,11 +3,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Accountant
+    name: AuctionSuperApp
     network: "{{network}}"
     source:
-      address: "{{accountantAddress}}"
-      abi: Accountant
+      address: "{{auctionSuperApp}}"
+      abi: AuctionSuperApp
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
@@ -16,37 +16,29 @@ dataSources:
       entities:
         - ERC721License
       abis:
-        - name: Accountant
-          file: ./abis/Accountant.json
+        - name: AuctionSuperApp
+          file: ./node_modules/@geo-web/contracts/dist/abi/contracts/AuctionSuperApp.sol/AuctionSuperApp.json
       eventHandlers:
-        - event: ContributionRateUpdated(indexed uint256,uint256)
-          handler: handleContributionRateUpdated
-      file: ./src/mapping.ts
-  - kind: ethereum/contract
-    name: ETHExpirationCollector
-    network: "{{network}}"
-    source:
-      address: "{{collectorAddress}}"
-      abi: ETHExpirationCollector
-      startBlock: {{ startBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - ERC721License
-      abis:
-        - name: ETHExpirationCollector
-          file: ./abis/ETHExpirationCollector.json
-      eventHandlers:
-        - event: LicenseExpirationUpdated(indexed uint256,uint256)
-          handler: handleLicenseExpirationUpdated
+        - event: BidPlaced(indexed uint256,indexed address,indexed address)
+          handler: handleBidEvent
+        - event: BidAccepted(indexed uint256,indexed address,indexed address,uint256)
+          handler: handleBidEvent
+        - event: BidRejected(indexed uint256,indexed address,indexed address)
+          handler: handleBidEvent
+        - event: BidClaimed(indexed uint256,indexed address,indexed address,address,uint256)
+          handler: handleBidEvent
+        - event: ParcelClaimed(indexed uint256,indexed address,uint256)
+          handler: handleBidEvent
+        - event: ParcelReclaimed(indexed uint256,indexed address,uint256)
+          handler: handleBidEvent
+        - event: OwnerBidUpdated(indexed uint256,indexed address)
+          handler: handleBidEvent
       file: ./src/mapping.ts
   - kind: ethereum/contract
     name: GeoWebParcel
     network: "{{network}}"
     source:
-      address: "{{parcelAddress}}"
+      address: "{{geoWebParcel}}"
       abi: GeoWebParcel
       startBlock: {{ startBlock }}
     mapping:
@@ -57,7 +49,7 @@ dataSources:
         - LandParcel
       abis:
         - name: GeoWebParcel
-          file: ./abis/GeoWebParcel.json
+          file: ./node_modules/@geo-web/contracts/dist/abi/contracts/GeoWebParcel.sol/GeoWebParcel.json
       eventHandlers:
         - event: ParcelBuilt(indexed uint256)
           handler: handleParcelBuilt
@@ -66,7 +58,7 @@ dataSources:
     name: ERC721License
     network: "{{network}}"
     source:
-      address: "{{licenseAddress}}"
+      address: "{{erc721License}}"
       abi: ERC721License
       startBlock: {{ startBlock }}
     mapping:
@@ -77,7 +69,7 @@ dataSources:
         - ERC721License
       abis:
         - name: ERC721License
-          file: ./abis/ERC721License.json
+          file: ./node_modules/@geo-web/contracts/dist/abi/contracts/ERC721License.sol/ERC721License.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleLicenseTransfer
