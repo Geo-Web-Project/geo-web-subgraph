@@ -12,7 +12,7 @@ import {
 } from "as-geo-web-coordinate/assembly";
 import {
   GeoWebParcel,
-  MintGeoWebParcel,
+  ParcelBuilt,
 } from "../generated/GeoWebParcel/GeoWebParcel";
 import {
   ERC721License,
@@ -21,9 +21,10 @@ import {
   GeoPoint,
 } from "../generated/schema";
 import { Transfer } from "../generated/ERC721License/ERC721License";
-import { LicenseInfoUpdated } from "../generated/GeoWebAdmin/GeoWebAdmin";
+import { ContributionRateUpdated } from "../generated/Accountant/Accountant";
+import { LicenseExpirationUpdated } from "../generated/ETHExpirationCollector/ETHExpirationCollector";
 
-export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
+export function handleParcelBuilt(event: ParcelBuilt): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
   let landParcelEntity = LandParcel.load(event.params._id.toHex());
@@ -82,7 +83,7 @@ export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   landParcelEntity.save();
 }
 
-function saveGWCoord(gwCoord: u64, landParcelID: string, event: MintGeoWebParcel): void {
+function saveGWCoord(gwCoord: u64, landParcelID: string, event: ParcelBuilt): void {
   let entity = GWCoord.load(gwCoord.toString());
 
   if (entity == null) {
@@ -143,14 +144,24 @@ export function handleLicenseTransfer(event: Transfer): void {
   entity.save();
 }
 
-export function handleLicenseInfoUpdated(event: LicenseInfoUpdated): void {
-  let entity = ERC721License.load(event.params._licenseId.toHex());
+export function handleContributionRateUpdated(event: ContributionRateUpdated): void {
+  let entity = ERC721License.load(event.params.id.toHex());
 
   if (entity == null) {
-    entity = new ERC721License(event.params._licenseId.toHex());
+    entity = new ERC721License(event.params.id.toHex());
   }
 
-  entity.value = event.params.value;
-  entity.expirationTimestamp = event.params.expirationTimestamp;
+  entity.contributionRate = event.params.newRate;
+  entity.save();
+}
+
+export function handleLicenseExpirationUpdated(event: LicenseExpirationUpdated): void {
+  let entity = ERC721License.load(event.params.licenseId.toHex());
+
+  if (entity == null) {
+    entity = new ERC721License(event.params.licenseId.toHex());
+  }
+
+  entity.expirationTimestamp = event.params.newExpirationTimestamp;
   entity.save();
 }
