@@ -28,10 +28,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@graphprotocol/graph-cli@0.21.1":
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.21.1.tgz#06cc85f3b950c01ca12c87c1fa47cacf4deec078"
-  integrity sha512-bqHlHZTzfEJICUpGQQr4Pru07OiGiOpIiwkVSdQMJaiuwu+bflMmLJNYNbSRH2byqaWDZvc4MI3U9CwUYXdRRw==
+"@graphprotocol/graph-cli@^0.21.1":
+  version "0.21.2"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.21.2.tgz#1b73181c326e3d676a850a4c082e50c2ada30497"
+  integrity sha512-X/lJImltfa68XZhdtx3PPGPYyjIrA/TOd8XydE07NTRrugs9LoqSTNUETtZpKELRSx9uTegLDyoTGwdSPU7EJQ==
   dependencies:
     assemblyscript "git+https://github.com/AssemblyScript/assemblyscript.git#v0.6"
     chalk "^3.0.0"
@@ -54,7 +54,7 @@
     tmp-promise "^3.0.2"
     yaml "^1.5.1"
 
-"@graphprotocol/graph-ts@0.21.1":
+"@graphprotocol/graph-ts@^0.20.1":
   version "0.20.1"
   resolved "https://registry.yarnpkg.com/@graphprotocol/graph-ts/-/graph-ts-0.20.1.tgz#42a45158c5904224f28d3cf6c5d1ffc876720f81"
   integrity sha512-JATb0tERXt+JZUYuW9rwfnLzIM4EOBHf/EEZir5JMiIVMP55CoOyQGAwH2dvKSm5O8WQ1BfdbnOvk7YNVMFHsg==
