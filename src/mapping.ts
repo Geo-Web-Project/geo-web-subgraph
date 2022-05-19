@@ -132,13 +132,10 @@ function saveGWCoord(
 
   entity.landParcel = landParcelID;
   entity.createdAtBlock = event.block.number;
-  // TODO: Index x and y
-  // entity.x = BigInt.fromUnsignedBytes(
-  //   ByteArray.fromHexString(GeoWebCoordinate.get_x(gwCoord).toString(16))
-  // );
-  // entity.y = BigInt.fromUnsignedBytes(
-  //   ByteArray.fromHexString(GeoWebCoordinate.get_y(gwCoord).toString(16))
-  // );
+  let coordX: i32 = GeoWebCoordinate.get_x(gwCoord);
+  let coordY: i32 = GeoWebCoordinate.get_y(gwCoord);
+  entity.coordX = BigInt.fromI32(coordX);
+  entity.coordY = BigInt.fromI32(coordY);
   entity.save();
 }
 
