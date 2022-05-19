@@ -3,11 +3,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Accountant
+    name: GeoWebAdmin
     network: "{{network}}"
     source:
-      address: "{{accountantAddress}}"
-      abi: Accountant
+      address: "{{adminAddress}}"
+      abi: GeoWebAdmin
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
@@ -16,31 +16,11 @@ dataSources:
       entities:
         - ERC721License
       abis:
-        - name: Accountant
-          file: ./abis/Accountant.json
+        - name: GeoWebAdmin
+          file: ./abis/GeoWebAdmin.json
       eventHandlers:
-        - event: ContributionRateUpdated(indexed uint256,uint256)
-          handler: handleContributionRateUpdated
-      file: ./src/mapping.ts
-  - kind: ethereum/contract
-    name: ETHExpirationCollector
-    network: "{{network}}"
-    source:
-      address: "{{collectorAddress}}"
-      abi: ETHExpirationCollector
-      startBlock: {{ startBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - ERC721License
-      abis:
-        - name: ETHExpirationCollector
-          file: ./abis/ETHExpirationCollector.json
-      eventHandlers:
-        - event: LicenseExpirationUpdated(indexed uint256,uint256)
-          handler: handleLicenseExpirationUpdated
+        - event: LicenseInfoUpdated(indexed uint256,uint256,uint256)
+          handler: handleLicenseInfoUpdated
       file: ./src/mapping.ts
   - kind: ethereum/contract
     name: GeoWebParcel
@@ -59,8 +39,8 @@ dataSources:
         - name: GeoWebParcel
           file: ./abis/GeoWebParcel.json
       eventHandlers:
-        - event: ParcelBuilt(indexed uint256)
-          handler: handleParcelBuilt
+        - event: MintGeoWebParcel(indexed uint256)
+          handler: handleMintGeoWebParcel
       file: ./src/mapping.ts
   - kind: ethereum/contract
     name: ERC721License
@@ -81,4 +61,8 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleLicenseTransfer
+        - event: RootContentCIDUpdated(indexed uint256,string)
+          handler: handleRootCIDUpdated
+        - event: RootContentCIDRemoved(indexed uint256)
+          handler: handleRootCIDRemoved
       file: ./src/mapping.ts

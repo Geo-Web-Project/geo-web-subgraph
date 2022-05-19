@@ -12,7 +12,7 @@ import {
 } from "as-geo-web-coordinate/assembly";
 import {
   GeoWebParcel,
-  ParcelBuilt,
+  MintGeoWebParcel,
 } from "../generated/GeoWebParcel/GeoWebParcel";
 import {
   ERC721License,
@@ -20,11 +20,10 @@ import {
   GeoWebCoordinate as GWCoord,
   GeoPoint,
 } from "../generated/schema";
-import { Transfer } from "../generated/ERC721License/ERC721License";
-import { ContributionRateUpdated } from "../generated/Accountant/Accountant";
-import { LicenseExpirationUpdated } from "../generated/ETHExpirationCollector/ETHExpirationCollector";
+import { Transfer, RootContentCIDUpdated, RootContentCIDRemoved } from "../generated/ERC721License/ERC721License";
+import { LicenseInfoUpdated } from "../generated/GeoWebAdmin/GeoWebAdmin";
 
-export function handleParcelBuilt(event: ParcelBuilt): void {
+export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
   let landParcelEntity = LandParcel.load(event.params._id.toHex());
@@ -83,7 +82,7 @@ export function handleParcelBuilt(event: ParcelBuilt): void {
   landParcelEntity.save();
 }
 
-function saveGWCoord(gwCoord: u64, landParcelID: string, event: ParcelBuilt): void {
+function saveGWCoord(gwCoord: u64, landParcelID: string, event: MintGeoWebParcel): void {
   let entity = GWCoord.load(gwCoord.toString());
 
   if (entity == null) {
@@ -144,24 +143,36 @@ export function handleLicenseTransfer(event: Transfer): void {
   entity.save();
 }
 
-export function handleContributionRateUpdated(event: ContributionRateUpdated): void {
-  let entity = ERC721License.load(event.params.id.toHex());
+export function handleLicenseInfoUpdated(event: LicenseInfoUpdated): void {
+  let entity = ERC721License.load(event.params._licenseId.toHex());
 
   if (entity == null) {
-    entity = new ERC721License(event.params.id.toHex());
+    entity = new ERC721License(event.params._licenseId.toHex());
   }
 
-  entity.contributionRate = event.params.newRate;
+  entity.value = event.params.value;
+  entity.expirationTimestamp = event.params.expirationTimestamp;
   entity.save();
 }
 
-export function handleLicenseExpirationUpdated(event: LicenseExpirationUpdated): void {
-  let entity = ERC721License.load(event.params.licenseId.toHex());
+export function handleRootCIDUpdated(event: RootContentCIDUpdated): void {
+  let entity = ERC721License.load(event.params.tokenId.toHex());
 
   if (entity == null) {
-    entity = new ERC721License(event.params.licenseId.toHex());
+    entity = new ERC721License(event.params.tokenId.toHex());
   }
 
-  entity.expirationTimestamp = event.params.newExpirationTimestamp;
+  entity.rootCID = event.params.rootContent;
+  entity.save();
+}
+
+export function handleRootCIDRemoved(event: RootContentCIDRemoved): void {
+  let entity = ERC721License.load(event.params.tokenId.toHex());
+
+  if (entity == null) {
+    entity = new ERC721License(event.params.tokenId.toHex());
+  }
+
+  entity.rootCID = "";
   entity.save();
 }

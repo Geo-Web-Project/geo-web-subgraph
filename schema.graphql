@@ -1,8 +1,9 @@
 type ERC721License @entity {
   id: ID!
   owner: Bytes
-  contributionRate: BigInt
+  value: BigInt
   expirationTimestamp: BigInt
+  rootCID: String
   landParcel: LandParcel
 }
 
@@ -14,10 +15,10 @@ type LandParcel @entity {
 
 type GeoWebCoordinate @entity {
   id: ID!
-  coordX: BigInt!
-  coordY: BigInt!
   landParcel: LandParcel!
   createdAtBlock: BigInt!
+  coordX: BigInt!
+  coordY: BigInt!
   pointBL: GeoPoint!
   pointBR: GeoPoint!
   pointTR: GeoPoint!
