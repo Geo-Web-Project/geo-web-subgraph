@@ -19,13 +19,11 @@ import {
   ERC721License,
   LandParcel,
   GeoWebCoordinate as GWCoord,
-  GeoPoint
+  GeoPoint,
+  Bid
 } from "../generated/schema";
 import { Transfer } from "../generated/ERC721License/ERC721License";
-import {
-  AuctionSuperApp,
-  BidPlaced
-} from "../generated/AuctionSuperApp/AuctionSuperApp";
+import { AuctionSuperApp } from "../generated/AuctionSuperApp/AuctionSuperApp";
 
 export function handleParcelBuilt(event: ParcelBuilt): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -152,18 +150,50 @@ export function handleLicenseTransfer(event: Transfer): void {
 }
 
 export function handleBidEvent(event: ethereum.Event): void {
-  let entity = ERC721License.load(event.parameters[0].value.toBigInt().toHex());
+  let licenseId = event.parameters[0].value.toBigInt();
+  let license = ERC721License.load(licenseId.toHex());
 
-  if (entity == null) {
-    entity = new ERC721License(event.parameters[0].value.toBigInt().toHex());
+  if (license == null) {
+    license = new ERC721License(licenseId.toHex());
   }
 
   let contract = AuctionSuperApp.bind(event.address);
-  let bid = contract.currentOwnerBid(event.parameters[0].value.toBigInt());
+  let currentOwnerBidData = contract.currentOwnerBid(licenseId);
 
-  entity.contributionRate = bid.value2;
-  entity.perSecondFeeNumerator = bid.value3;
-  entity.perSecondFeeDenominator = bid.value4;
-  entity.forSalePrice = bid.value5;
-  entity.save();
+  let currentOwnerBidId = license.owner.toHex() + "-" + licenseId.toHex();
+  let currentOwnerBid = Bid.load(currentOwnerBidId);
+
+  if (currentOwnerBid == null) {
+    currentOwnerBid = new Bid(currentOwnerBidId);
+  }
+
+  currentOwnerBid.timestamp = currentOwnerBidData.value0;
+  currentOwnerBid.bidder = currentOwnerBidData.value1;
+  currentOwnerBid.contributionRate = currentOwnerBidData.value2;
+  currentOwnerBid.perSecondFeeNumerator = currentOwnerBidData.value3;
+  currentOwnerBid.perSecondFeeDenominator = currentOwnerBidData.value4;
+  currentOwnerBid.forSalePrice = currentOwnerBidData.value5;
+  currentOwnerBid.save();
+
+  let outstandingBidData = contract.outstandingBid(licenseId);
+
+  let outstandingBidId =
+    outstandingBidData.value1.toHex() + "-" + licenseId.toHex();
+  let outstandingBid = Bid.load(outstandingBidId);
+
+  if (outstandingBid == null) {
+    outstandingBid = new Bid(outstandingBidId);
+  }
+
+  outstandingBid.timestamp = outstandingBidData.value0;
+  outstandingBid.bidder = outstandingBidData.value1;
+  outstandingBid.contributionRate = outstandingBidData.value2;
+  outstandingBid.perSecondFeeNumerator = outstandingBidData.value3;
+  outstandingBid.perSecondFeeDenominator = outstandingBidData.value4;
+  outstandingBid.forSalePrice = outstandingBidData.value5;
+  outstandingBid.save();
+
+  license.currentOwnerBid = currentOwnerBid.id;
+  license.outstandingBid = outstandingBid.id;
+  license.save();
 }
