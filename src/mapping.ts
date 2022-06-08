@@ -28,7 +28,7 @@ import { AuctionSuperApp } from "../generated/AuctionSuperApp/AuctionSuperApp";
 const GW_MAX_LAT: u32 = (1 << 21) - 1;
 const GW_MAX_LON: u32 = (1 << 22) - 1;
 
-export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
+export function handleParcelBuilt(event: ParcelBuilt): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
   let landParcelEntity = LandParcel.load(event.params._id.toHex());
