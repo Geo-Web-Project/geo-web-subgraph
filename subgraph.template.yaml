@@ -51,8 +51,8 @@ dataSources:
         - name: GeoWebParcel
           file: ./node_modules/@geo-web/contracts/dist/abi/contracts/GeoWebParcel.sol/GeoWebParcel.json
       eventHandlers:
-        - event: ParcelBuilt(indexed uint256)
-          handler: handleParcelBuilt
+        - event: MintGeoWebParcel(indexed uint256)
+          handler: handleMintGeoWebParcel
       file: ./src/mapping.ts
   - kind: ethereum/contract
     name: ERC721License
@@ -73,4 +73,8 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleLicenseTransfer
+        - event: RootContentCIDUpdated(indexed uint256,string)
+          handler: handleRootCIDUpdated
+        - event: RootContentCIDRemoved(indexed uint256)
+          handler: handleRootCIDRemoved
       file: ./src/mapping.ts
