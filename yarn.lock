@@ -1456,10 +1456,10 @@ array-unique@^0.3.2:
   resolved "https://registry.yarnpkg.com/array-unique/-/array-unique-0.3.2.tgz#a894b75d4bc4f6cd679ef3244a9fd8f46ae2d428"
   integrity sha512-SleRWjh9JUud2wH1hPs9rZBZ33H6T9HOiL0uwGnGx9FpE6wKGyfWugmbkEOIs6qWrZhg0LWeLziLrEwQJhs5mQ==
 
-as-geo-web-coordinate@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/as-geo-web-coordinate/-/as-geo-web-coordinate-0.6.0.tgz#0fabc5f69dff2dd9fa62cce2056ac13153c424f0"
-  integrity sha512-u+P7lh3iBSx1t213euTEKiqJOkz6qVfhbUEDa8/DbQWf3fK1CNHanqnC2QvMT1iiyGEoE0x+Bam/agwPags9yg==
+as-geo-web-coordinate@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/as-geo-web-coordinate/-/as-geo-web-coordinate-0.7.0.tgz#9c0d65e730c416b9c91daf6cd4f950bb6b4090e6"
+  integrity sha512-ej94VlTekRUdOtOQkzSH/bZybQFaMMJ0oeSV4qxovtQeXlc9AMzQ/VGIrihq0myFcC3WFaFPT7rkh1uTt1OKkQ==
   dependencies:
     "@assemblyscript/loader" "^0.17.0"
 

@@ -25,6 +25,9 @@ import {
 import { Transfer } from "../generated/ERC721License/ERC721License";
 import { AuctionSuperApp } from "../generated/AuctionSuperApp/AuctionSuperApp";
 
+const GW_MAX_LAT: u32 = (1 << 21) - 1;
+const GW_MAX_LON: u32 = (1 << 22) - 1;
+
 export function handleParcelBuilt(event: ParcelBuilt): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
@@ -75,7 +78,9 @@ export function handleParcelBuilt(event: ParcelBuilt): void {
     // Traverse to next coordinate
     currentCoord = GeoWebCoordinate.traverse(
       currentCoord,
-      directionPath.direction
+      directionPath.direction,
+      GW_MAX_LAT,
+      GW_MAX_LON
     );
   } while (true);
 
@@ -95,7 +100,9 @@ function saveGWCoord(
     entity = new GWCoord(gwCoord.toString());
   }
 
-  let coords = GeoWebCoordinate.to_gps(gwCoord).map<BigDecimal>((v: f64) => {
+  let coords = GeoWebCoordinate.to_gps(gwCoord, GW_MAX_LAT, GW_MAX_LON).map<
+    BigDecimal
+  >((v: f64) => {
     return BigDecimal.fromString(v.toString());
   });
 
