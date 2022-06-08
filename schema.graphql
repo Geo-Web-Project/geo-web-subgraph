@@ -1,10 +1,19 @@
 type ERC721License @entity {
   id: ID!
   owner: Bytes
-  value: BigInt
-  expirationTimestamp: BigInt
-  rootCID: String
   landParcel: LandParcel
+  currentOwnerBid: Bid
+  outstandingBid: Bid
+}
+
+type Bid @entity {
+  id: ID!
+  timestamp: BigInt!
+  bidder: Bytes!
+  contributionRate: BigInt!
+  perSecondFeeNumerator: BigInt!
+  perSecondFeeDenominator: BigInt!
+  forSalePrice: BigInt!
 }
 
 type LandParcel @entity {

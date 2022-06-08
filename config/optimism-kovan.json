@@ -1,0 +1,11 @@
+{
+  "network": "optimism-kovan",
+  "geoWebCoordinate": "0xa26715061D253A41D1f0BB90f162d54ecC282E57",
+  "geoWebCoordinatePath": "0xBD260068682aE150CeEbBD9B88109D18EdBc415E",
+  "geoWebParcel": "0x6E7861d67b7619bc946D73674F1695E428FF3d73",
+  "erc721License": "0x9F83D8af21FADbbDC8c9e64bA8374FEb623eEFB3",
+  "fairLaunchClaimer": "0xb49e55847e3E60C78BDd96816b0eF6c1DE60cE86",
+  "reclaimer": "0xe9b5ab496FD9CD95948D3b4bAAA471Eef313C7CF",
+  "auctionSuperApp": "0xBB53852D323E26DB296B753dF58B09B9B0924D1b",
+  "startBlock": 3779813
+}

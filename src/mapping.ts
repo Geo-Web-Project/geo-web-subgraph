@@ -1,29 +1,34 @@
 import {
+  ethereum,
   Address,
   BigInt,
   BigDecimal,
-  ByteArray,
+  ByteArray
 } from "@graphprotocol/graph-ts";
 import {
   DirectionPath,
   GeoWebCoordinate,
   GeoWebCoordinatePath,
-  u256,
+  u256
 } from "as-geo-web-coordinate/assembly";
 import {
   GeoWebParcel,
-  MintGeoWebParcel,
+  ParcelBuilt
 } from "../generated/GeoWebParcel/GeoWebParcel";
 import {
   ERC721License,
   LandParcel,
   GeoWebCoordinate as GWCoord,
   GeoPoint,
+  Bid
 } from "../generated/schema";
-import { Transfer, RootContentCIDUpdated, RootContentCIDRemoved } from "../generated/ERC721License/ERC721License";
-import { LicenseInfoUpdated } from "../generated/GeoWebAdmin/GeoWebAdmin";
+import { Transfer } from "../generated/ERC721License/ERC721License";
+import { AuctionSuperApp } from "../generated/AuctionSuperApp/AuctionSuperApp";
 
-export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
+const GW_MAX_LAT: u32 = (1 << 21) - 1;
+const GW_MAX_LON: u32 = (1 << 22) - 1;
+
+export function handleParcelBuilt(event: ParcelBuilt): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
   let landParcelEntity = LandParcel.load(event.params._id.toHex());
@@ -73,7 +78,9 @@ export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
     // Traverse to next coordinate
     currentCoord = GeoWebCoordinate.traverse(
       currentCoord,
-      directionPath.direction
+      directionPath.direction,
+      GW_MAX_LAT,
+      GW_MAX_LON
     );
   } while (true);
 
@@ -82,14 +89,20 @@ export function handleMintGeoWebParcel(event: MintGeoWebParcel): void {
   landParcelEntity.save();
 }
 
-function saveGWCoord(gwCoord: u64, landParcelID: string, event: MintGeoWebParcel): void {
+function saveGWCoord(
+  gwCoord: u64,
+  landParcelID: string,
+  event: ParcelBuilt
+): void {
   let entity = GWCoord.load(gwCoord.toString());
 
   if (entity == null) {
     entity = new GWCoord(gwCoord.toString());
   }
 
-  let coords = GeoWebCoordinate.to_gps(gwCoord).map<BigDecimal>((v: f64) => {
+  let coords = GeoWebCoordinate.to_gps(gwCoord, GW_MAX_LAT, GW_MAX_LON).map<
+    BigDecimal
+  >((v: f64) => {
     return BigDecimal.fromString(v.toString());
   });
 
@@ -143,36 +156,51 @@ export function handleLicenseTransfer(event: Transfer): void {
   entity.save();
 }
 
-export function handleLicenseInfoUpdated(event: LicenseInfoUpdated): void {
-  let entity = ERC721License.load(event.params._licenseId.toHex());
+export function handleBidEvent(event: ethereum.Event): void {
+  let licenseId = event.parameters[0].value.toBigInt();
+  let license = ERC721License.load(licenseId.toHex());
 
-  if (entity == null) {
-    entity = new ERC721License(event.params._licenseId.toHex());
+  if (license == null) {
+    license = new ERC721License(licenseId.toHex());
   }
 
-  entity.value = event.params.value;
-  entity.expirationTimestamp = event.params.expirationTimestamp;
-  entity.save();
-}
+  let contract = AuctionSuperApp.bind(event.address);
+  let currentOwnerBidData = contract.currentOwnerBid(licenseId);
 
-export function handleRootCIDUpdated(event: RootContentCIDUpdated): void {
-  let entity = ERC721License.load(event.params.tokenId.toHex());
+  let currentOwnerBidId = license.owner.toHex() + "-" + licenseId.toHex();
+  let currentOwnerBid = Bid.load(currentOwnerBidId);
 
-  if (entity == null) {
-    entity = new ERC721License(event.params.tokenId.toHex());
+  if (currentOwnerBid == null) {
+    currentOwnerBid = new Bid(currentOwnerBidId);
   }
 
-  entity.rootCID = event.params.rootContent;
-  entity.save();
-}
+  currentOwnerBid.timestamp = currentOwnerBidData.value0;
+  currentOwnerBid.bidder = currentOwnerBidData.value1;
+  currentOwnerBid.contributionRate = currentOwnerBidData.value2;
+  currentOwnerBid.perSecondFeeNumerator = currentOwnerBidData.value3;
+  currentOwnerBid.perSecondFeeDenominator = currentOwnerBidData.value4;
+  currentOwnerBid.forSalePrice = currentOwnerBidData.value5;
+  currentOwnerBid.save();
 
-export function handleRootCIDRemoved(event: RootContentCIDRemoved): void {
-  let entity = ERC721License.load(event.params.tokenId.toHex());
+  let outstandingBidData = contract.outstandingBid(licenseId);
 
-  if (entity == null) {
-    entity = new ERC721License(event.params.tokenId.toHex());
+  let outstandingBidId =
+    outstandingBidData.value1.toHex() + "-" + licenseId.toHex();
+  let outstandingBid = Bid.load(outstandingBidId);
+
+  if (outstandingBid == null) {
+    outstandingBid = new Bid(outstandingBidId);
   }
 
-  entity.rootCID = "";
-  entity.save();
+  outstandingBid.timestamp = outstandingBidData.value0;
+  outstandingBid.bidder = outstandingBidData.value1;
+  outstandingBid.contributionRate = outstandingBidData.value2;
+  outstandingBid.perSecondFeeNumerator = outstandingBidData.value3;
+  outstandingBid.perSecondFeeDenominator = outstandingBidData.value4;
+  outstandingBid.forSalePrice = outstandingBidData.value5;
+  outstandingBid.save();
+
+  license.currentOwnerBid = currentOwnerBid.id;
+  license.outstandingBid = outstandingBid.id;
+  license.save();
 }

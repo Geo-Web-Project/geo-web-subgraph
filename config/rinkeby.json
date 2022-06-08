@@ -1,8 +1,11 @@
 {
-    "network": "rinkeby",
-    "accountantAddress": "0x45fdCbcAaBE80b630d83a0f5a0Fb4a8b9cEFf84E",
-    "parcelAddress": "0x36Cf448d15Dbf4365c7421FA94dBEC93B95720E4",
-    "licenseAddress": "0xF2282541d384D6d9A5C9B02D020fDFededd8D827",
-    "collectorAddress": "0x8C6e0d49ca34fd262B209509F32aE4eC8D04F9eE",
-    "startBlock": 9586861
+  "network": "rinkeby",
+  "geoWebCoordinate": "0xFa715d9a283b38A0bCAEC012AAE3877690F5Bb72",
+  "geoWebCoordinatePath": "0x1BeF8BD9862974868C27CDAC03E9aEc785456cf6",
+  "geoWebParcel": "0xF1ec2e713DF0c7Bbad390Ae52a17a7Ed35059DaA",
+  "erc721License": "0x1f88b79438Be7dc59d2644168D2E0879e283fFCb",
+  "fairLaunchClaimer": "0xe62D6E28597471a84daa57392021a21696e17404",
+  "reclaimer": "0xaE62A19F16b0573006BC61183c9C1d141d1B9433",
+  "auctionSuperApp": "0xe7B42eD377937682D458E74352D621690165d7F1",
+  "startBlock": 9586861
 }
