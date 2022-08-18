@@ -3,45 +3,43 @@ import {
   Address,
   BigInt,
   BigDecimal,
-  ByteArray
+  ByteArray,
 } from "@graphprotocol/graph-ts";
 import {
   DirectionPath,
   GeoWebCoordinate,
   GeoWebCoordinatePath,
-  u256
+  u256,
 } from "as-geo-web-coordinate/assembly";
 import {
   GeoWebParcel,
-  ParcelBuilt
-} from "../generated/GeoWebParcel/GeoWebParcel";
-import {
-  ERC721License,
-  LandParcel,
+  Bidder,
   GeoWebCoordinate as GWCoord,
   GeoPoint,
-  Bid
+  Bid,
 } from "../generated/schema";
-import { Transfer } from "../generated/ERC721License/ERC721License";
-import { AuctionSuperApp } from "../generated/AuctionSuperApp/AuctionSuperApp";
+import {
+  Transfer,
+  RegistryDiamond,
+  ParcelClaimed,
+} from "../generated/RegistryDiamond/RegistryDiamond";
 
 const GW_MAX_LAT: u32 = (1 << 21) - 1;
 const GW_MAX_LON: u32 = (1 << 22) - 1;
 
-export function handleParcelBuilt(event: ParcelBuilt): void {
+export function handleParcelClaimed(event: ParcelClaimed): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
-  let landParcelEntity = LandParcel.load(event.params._id.toHex());
+  let parcelEntity = GeoWebParcel.load(event.params._licenseId.toHex());
 
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
-  if (landParcelEntity == null) {
-    landParcelEntity = new LandParcel(event.params._id.toHex());
-    landParcelEntity.license = event.params._id.toHex();
+  if (parcelEntity == null) {
+    parcelEntity = new GeoWebParcel(event.params._licenseId.toHex());
   }
 
-  let contract = GeoWebParcel.bind(event.address);
-  let parcel = contract.getLandParcel(event.params._id);
+  let contract = RegistryDiamond.bind(event.address);
+  let parcel = contract.getLandParcel(event.params._licenseId);
 
   let numPaths = parcel.value1.length;
   let paths: BigInt[] = parcel.value1;
@@ -56,7 +54,7 @@ export function handleParcelBuilt(event: ParcelBuilt): void {
     currentPath = u256.fromUint8ArrayLE(paths[p_i]);
   }
   do {
-    saveGWCoord(currentCoord, landParcelEntity.id, event);
+    saveGWCoord(currentCoord, parcelEntity.id, event);
     coordIDs[i] = currentCoord.toString();
     i += 1;
 
@@ -84,15 +82,18 @@ export function handleParcelBuilt(event: ParcelBuilt): void {
     );
   } while (true);
 
-  landParcelEntity.coordinates = coordIDs;
+  let beaconProxy = contract.getBeaconProxy(event.params._licenseId);
 
-  landParcelEntity.save();
+  parcelEntity.coordinates = coordIDs;
+  parcelEntity.licenseDiamond = beaconProxy;
+
+  parcelEntity.save();
 }
 
 function saveGWCoord(
   gwCoord: u64,
-  landParcelID: string,
-  event: ParcelBuilt
+  parcelID: string,
+  event: ParcelClaimed
 ): void {
   let entity = GWCoord.load(gwCoord.toString());
 
@@ -100,9 +101,11 @@ function saveGWCoord(
     entity = new GWCoord(gwCoord.toString());
   }
 
-  let coords = GeoWebCoordinate.to_gps(gwCoord, GW_MAX_LAT, GW_MAX_LON).map<
-    BigDecimal
-  >((v: f64) => {
+  let coords = GeoWebCoordinate.to_gps(
+    gwCoord,
+    GW_MAX_LAT,
+    GW_MAX_LON
+  ).map<BigDecimal>((v: f64) => {
     return BigDecimal.fromString(v.toString());
   });
 
@@ -135,7 +138,7 @@ function saveGWCoord(
     pointEntity.save();
   }
 
-  entity.landParcel = landParcelID;
+  entity.parcel = parcelID;
   entity.createdAtBlock = event.block.number;
   let coordX: i32 = GeoWebCoordinate.get_x(gwCoord);
   let coordY: i32 = GeoWebCoordinate.get_y(gwCoord);
@@ -145,62 +148,61 @@ function saveGWCoord(
 }
 
 export function handleLicenseTransfer(event: Transfer): void {
-  let entity = ERC721License.load(event.params.tokenId.toHex());
+  let entity = GeoWebParcel.load(event.params.tokenId.toHex());
 
   if (entity == null) {
-    entity = new ERC721License(event.params.tokenId.toHex());
+    entity = new GeoWebParcel(event.params.tokenId.toHex());
   }
 
-  entity.owner = event.params.to;
-  entity.landParcel = event.params.tokenId.toHex();
+  entity.licenseOwner = event.params.to;
   entity.save();
 }
 
-export function handleBidEvent(event: ethereum.Event): void {
-  let licenseId = event.parameters[0].value.toBigInt();
-  let license = ERC721License.load(licenseId.toHex());
-
-  if (license == null) {
-    license = new ERC721License(licenseId.toHex());
-  }
-
-  let contract = AuctionSuperApp.bind(event.address);
-  let currentOwnerBidData = contract.currentOwnerBid(licenseId);
-
-  let currentOwnerBidId = license.owner.toHex() + "-" + licenseId.toHex();
-  let currentOwnerBid = Bid.load(currentOwnerBidId);
-
-  if (currentOwnerBid == null) {
-    currentOwnerBid = new Bid(currentOwnerBidId);
-  }
-
-  currentOwnerBid.timestamp = currentOwnerBidData.value0;
-  currentOwnerBid.bidder = currentOwnerBidData.value1;
-  currentOwnerBid.contributionRate = currentOwnerBidData.value2;
-  currentOwnerBid.perSecondFeeNumerator = currentOwnerBidData.value3;
-  currentOwnerBid.perSecondFeeDenominator = currentOwnerBidData.value4;
-  currentOwnerBid.forSalePrice = currentOwnerBidData.value5;
-  currentOwnerBid.save();
-
-  let outstandingBidData = contract.outstandingBid(licenseId);
-
-  let outstandingBidId =
-    outstandingBidData.value1.toHex() + "-" + licenseId.toHex();
-  let outstandingBid = Bid.load(outstandingBidId);
-
-  if (outstandingBid == null) {
-    outstandingBid = new Bid(outstandingBidId);
-  }
-
-  outstandingBid.timestamp = outstandingBidData.value0;
-  outstandingBid.bidder = outstandingBidData.value1;
-  outstandingBid.contributionRate = outstandingBidData.value2;
-  outstandingBid.perSecondFeeNumerator = outstandingBidData.value3;
-  outstandingBid.perSecondFeeDenominator = outstandingBidData.value4;
-  outstandingBid.forSalePrice = outstandingBidData.value5;
-  outstandingBid.save();
-
-  license.currentOwnerBid = currentOwnerBid.id;
-  license.outstandingBid = outstandingBid.id;
-  license.save();
-}
+// export function handleBidEvent(event: ethereum.Event): void {
+//   let licenseId = event.parameters[0].value.toBigInt();
+//   let license = ERC721License.load(licenseId.toHex());
+//
+//   if (license == null) {
+//     license = new ERC721License(licenseId.toHex());
+//   }
+//
+//   let contract = AuctionSuperApp.bind(event.address);
+//   let currentOwnerBidData = contract.currentOwnerBid(licenseId);
+//
+//   let currentOwnerBidId = license.owner.toHex() + "-" + licenseId.toHex();
+//   let currentOwnerBid = Bid.load(currentOwnerBidId);
+//
+//   if (currentOwnerBid == null) {
+//     currentOwnerBid = new Bid(currentOwnerBidId);
+//   }
+//
+//   currentOwnerBid.timestamp = currentOwnerBidData.value0;
+//   currentOwnerBid.bidder = currentOwnerBidData.value1;
+//   currentOwnerBid.contributionRate = currentOwnerBidData.value2;
+//   currentOwnerBid.perSecondFeeNumerator = currentOwnerBidData.value3;
+//   currentOwnerBid.perSecondFeeDenominator = currentOwnerBidData.value4;
+//   currentOwnerBid.forSalePrice = currentOwnerBidData.value5;
+//   currentOwnerBid.save();
+//
+//   let outstandingBidData = contract.outstandingBid(licenseId);
+//
+//   let outstandingBidId =
+//     outstandingBidData.value1.toHex() + "-" + licenseId.toHex();
+//   let outstandingBid = Bid.load(outstandingBidId);
+//
+//   if (outstandingBid == null) {
+//     outstandingBid = new Bid(outstandingBidId);
+//   }
+//
+//   outstandingBid.timestamp = outstandingBidData.value0;
+//   outstandingBid.bidder = outstandingBidData.value1;
+//   outstandingBid.contributionRate = outstandingBidData.value2;
+//   outstandingBid.perSecondFeeNumerator = outstandingBidData.value3;
+//   outstandingBid.perSecondFeeDenominator = outstandingBidData.value4;
+//   outstandingBid.forSalePrice = outstandingBidData.value5;
+//   outstandingBid.save();
+//
+//   license.currentOwnerBid = currentOwnerBid.id;
+//   license.outstandingBid = outstandingBid.id;
+//   license.save();
+// }

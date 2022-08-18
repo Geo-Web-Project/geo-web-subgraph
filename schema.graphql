@@ -1,30 +1,32 @@
-type ERC721License @entity {
-  id: ID!
-  owner: Bytes
-  landParcel: LandParcel
-  currentOwnerBid: Bid
-  outstandingBid: Bid
-}
-
 type Bid @entity {
   id: ID!
   timestamp: BigInt!
-  bidder: Bytes!
+  bidder: Bidder!
   contributionRate: BigInt!
   perSecondFeeNumerator: BigInt!
   perSecondFeeDenominator: BigInt!
   forSalePrice: BigInt!
+  parcel: GeoWebParcel!
 }
 
-type LandParcel @entity {
+type Bidder @entity {
   id: ID!
-  license: ERC721License!
+  payerBids: [Bid!]
+  pendingBids: [Bid!]
+}
+
+type GeoWebParcel @entity {
+  id: ID!
   coordinates: [GeoWebCoordinate!]
+  licenseOwner: Bytes!
+  currentPayerBid: Bid!
+  pendingBid: Bid
+  licenseDiamond: Bytes!
 }
 
 type GeoWebCoordinate @entity {
   id: ID!
-  landParcel: LandParcel!
+  parcel: GeoWebParcel!
   createdAtBlock: BigInt!
   coordX: BigInt!
   coordY: BigInt!

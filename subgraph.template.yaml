@@ -3,74 +3,24 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: AuctionSuperApp
+    name: RegistryDiamond
     network: "{{network}}"
     source:
-      address: "{{auctionSuperApp}}"
-      abi: AuctionSuperApp
+      address: "{{registryDiamond}}"
+      abi: RegistryDiamond
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - ERC721License
+        - GeoWebParcel
       abis:
-        - name: AuctionSuperApp
-          file: ./node_modules/@geo-web/contracts/dist/abi/contracts/AuctionSuperApp.sol/AuctionSuperApp.json
+        - name: RegistryDiamond
+          file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/RegistryDiamond.json
       eventHandlers:
-        - event: BidPlaced(indexed uint256,indexed address,indexed address)
-          handler: handleBidEvent
-        - event: BidAccepted(indexed uint256,indexed address,indexed address,uint256)
-          handler: handleBidEvent
-        - event: BidRejected(indexed uint256,indexed address,indexed address)
-          handler: handleBidEvent
-        - event: BidClaimed(indexed uint256,indexed address,indexed address,address,uint256)
-          handler: handleBidEvent
-        - event: ParcelClaimed(indexed uint256,indexed address,uint256)
-          handler: handleBidEvent
-        - event: ParcelReclaimed(indexed uint256,indexed address,uint256)
-          handler: handleBidEvent
-        - event: OwnerBidUpdated(indexed uint256,indexed address)
-          handler: handleBidEvent
-      file: ./src/mapping.ts
-  - kind: ethereum/contract
-    name: GeoWebParcel
-    network: "{{network}}"
-    source:
-      address: "{{geoWebParcel}}"
-      abi: GeoWebParcel
-      startBlock: {{ startBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - LandParcel
-      abis:
-        - name: GeoWebParcel
-          file: ./node_modules/@geo-web/contracts/dist/abi/contracts/GeoWebParcel.sol/GeoWebParcel.json
-      eventHandlers:
-        - event: ParcelBuilt(indexed uint256)
-          handler: handleParcelBuilt
-      file: ./src/mapping.ts
-  - kind: ethereum/contract
-    name: ERC721License
-    network: "{{network}}"
-    source:
-      address: "{{erc721License}}"
-      abi: ERC721License
-      startBlock: {{ startBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - ERC721License
-      abis:
-        - name: ERC721License
-          file: ./node_modules/@geo-web/contracts/dist/abi/contracts/ERC721License.sol/ERC721License.json
-      eventHandlers:
+        - event: ParcelClaimed(indexed uint256,indexed address)
+          handler: handleParcelClaimed
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleLicenseTransfer
       file: ./src/mapping.ts
