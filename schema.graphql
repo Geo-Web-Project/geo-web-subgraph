@@ -11,15 +11,14 @@ type Bid @entity {
 
 type Bidder @entity {
   id: ID!
-  payerBids: [Bid!]
-  pendingBids: [Bid!]
+  bids: [Bid!]! @derivedFrom(field: "bidder")
 }
 
 type GeoWebParcel @entity {
   id: ID!
   coordinates: [GeoWebCoordinate!]
   licenseOwner: Bytes!
-  currentPayerBid: Bid!
+  currentBid: Bid!
   pendingBid: Bid
   licenseDiamond: Bytes!
 }

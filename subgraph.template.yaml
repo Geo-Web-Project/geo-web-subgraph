@@ -15,6 +15,8 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - GeoWebParcel
+        - GeoWebCoordinate
+        - GeoPoint
       abis:
         - name: RegistryDiamond
           file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/RegistryDiamond.json
@@ -23,4 +25,34 @@ dataSources:
           handler: handleParcelClaimed
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleLicenseTransfer
+      file: ./src/mapping.ts
+templates:
+  - kind: ethereum/contract
+    name: PCOLicenseDiamond
+    network: "{{network}}"
+    source:
+      abi: PCOLicenseDiamond
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Bid
+        - Bidder
+      abis:
+        - name: PCOLicenseDiamond
+          file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/PCOLicenseDiamond.json
+      eventHandlers:
+        - event: BidAccepted(indexed address,indexed address,uint256)
+          handler: handleBidAccepted
+        - event: BidPlaced(indexed address,int96,uint256)
+          handler: handleBidEvent
+        - event: BidRejected(indexed address,indexed address,uint256)
+          handler: handleBidEvent
+        - event: PayerContributionRateUpdated(indexed address,int96)
+          handler: handleBidEvent
+        - event: PayerForSalePriceUpdated(indexed address,uint256)
+          handler: handleBidEvent
+        - event: TransferTriggered(indexed address,indexed address,indexed address,uint256)
+          handler: handleTransferTriggered
       file: ./src/mapping.ts

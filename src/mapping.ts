@@ -23,6 +23,12 @@ import {
   RegistryDiamond,
   ParcelClaimed,
 } from "../generated/RegistryDiamond/RegistryDiamond";
+import { PCOLicenseDiamond as PCOLicenseDiamondTemplate } from "../generated/templates";
+import {
+  PCOLicenseDiamond,
+  TransferTriggered,
+  BidAccepted,
+} from "../generated/templates/PCOLicenseDiamond/PCOLicenseDiamond";
 
 const GW_MAX_LAT: u32 = (1 << 21) - 1;
 const GW_MAX_LON: u32 = (1 << 22) - 1;
@@ -86,6 +92,8 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
 
   parcelEntity.coordinates = coordIDs;
   parcelEntity.licenseDiamond = beaconProxy;
+
+  PCOLicenseDiamondTemplate.create(beaconProxy);
 
   parcelEntity.save();
 }
@@ -158,51 +166,86 @@ export function handleLicenseTransfer(event: Transfer): void {
   entity.save();
 }
 
-// export function handleBidEvent(event: ethereum.Event): void {
-//   let licenseId = event.parameters[0].value.toBigInt();
-//   let license = ERC721License.load(licenseId.toHex());
-//
-//   if (license == null) {
-//     license = new ERC721License(licenseId.toHex());
-//   }
-//
-//   let contract = AuctionSuperApp.bind(event.address);
-//   let currentOwnerBidData = contract.currentOwnerBid(licenseId);
-//
-//   let currentOwnerBidId = license.owner.toHex() + "-" + licenseId.toHex();
-//   let currentOwnerBid = Bid.load(currentOwnerBidId);
-//
-//   if (currentOwnerBid == null) {
-//     currentOwnerBid = new Bid(currentOwnerBidId);
-//   }
-//
-//   currentOwnerBid.timestamp = currentOwnerBidData.value0;
-//   currentOwnerBid.bidder = currentOwnerBidData.value1;
-//   currentOwnerBid.contributionRate = currentOwnerBidData.value2;
-//   currentOwnerBid.perSecondFeeNumerator = currentOwnerBidData.value3;
-//   currentOwnerBid.perSecondFeeDenominator = currentOwnerBidData.value4;
-//   currentOwnerBid.forSalePrice = currentOwnerBidData.value5;
-//   currentOwnerBid.save();
-//
-//   let outstandingBidData = contract.outstandingBid(licenseId);
-//
-//   let outstandingBidId =
-//     outstandingBidData.value1.toHex() + "-" + licenseId.toHex();
-//   let outstandingBid = Bid.load(outstandingBidId);
-//
-//   if (outstandingBid == null) {
-//     outstandingBid = new Bid(outstandingBidId);
-//   }
-//
-//   outstandingBid.timestamp = outstandingBidData.value0;
-//   outstandingBid.bidder = outstandingBidData.value1;
-//   outstandingBid.contributionRate = outstandingBidData.value2;
-//   outstandingBid.perSecondFeeNumerator = outstandingBidData.value3;
-//   outstandingBid.perSecondFeeDenominator = outstandingBidData.value4;
-//   outstandingBid.forSalePrice = outstandingBidData.value5;
-//   outstandingBid.save();
-//
-//   license.currentOwnerBid = currentOwnerBid.id;
-//   license.outstandingBid = outstandingBid.id;
-//   license.save();
-// }
+export function handleBidEvent(event: ethereum.Event): void {
+  let contract = PCOLicenseDiamond.bind(event.address);
+  let currentOwnerBidData = contract.currentBid();
+
+  let currentOwnerBidId =
+    contract.payer().toHex() + "-" + contract.licenseId().toHex();
+  let currentOwnerBid = Bid.load(currentOwnerBidId);
+
+  if (currentOwnerBid == null) {
+    currentOwnerBid = new Bid(currentOwnerBidId);
+  }
+
+  currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
+  currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
+  currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
+  currentOwnerBid.perSecondFeeNumerator =
+    currentOwnerBidData.perSecondFeeNumerator;
+  currentOwnerBid.perSecondFeeDenominator =
+    currentOwnerBidData.perSecondFeeDenominator;
+  currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
+  currentOwnerBid.save();
+
+  let currentBidder = Bidder.load(contract.payer().toHex());
+
+  if (currentBidder == null) {
+    currentBidder = new Bidder(contract.payer().toHex());
+  }
+
+  currentBidder.save();
+
+  let pendingBidData = contract.pendingBid();
+
+  let pendingBidId =
+    pendingBidData.bidder.toHex() + "-" + contract.licenseId().toHex();
+  let pendingBid = Bid.load(pendingBidId);
+
+  if (pendingBid == null) {
+    pendingBid = new Bid(pendingBidId);
+  }
+
+  pendingBid.timestamp = pendingBidData.timestamp;
+  pendingBid.bidder = pendingBidData.bidder.toHex();
+  pendingBid.contributionRate = pendingBidData.contributionRate;
+  pendingBid.perSecondFeeNumerator = pendingBidData.perSecondFeeNumerator;
+  pendingBid.perSecondFeeDenominator = pendingBidData.perSecondFeeDenominator;
+  pendingBid.forSalePrice = pendingBidData.forSalePrice;
+  pendingBid.save();
+
+  let pendingBidder = Bidder.load(pendingBidData.bidder.toHex());
+
+  if (pendingBidder == null) {
+    pendingBidder = new Bidder(pendingBidData.bidder.toHex());
+  }
+
+  pendingBidder.save();
+
+  let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  parcelEntity.pendingBid = pendingBid.id;
+  parcelEntity.currentBid = currentOwnerBid.id;
+  parcelEntity.save();
+}
+
+export function handleTransferTriggered(event: TransferTriggered): void {
+  let contract = PCOLicenseDiamond.bind(event.address);
+
+  let pendingBidId =
+    event.params._bidder.toHex() + "-" + contract.licenseId().toHex();
+
+  let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  parcelEntity.currentBid = pendingBidId;
+  parcelEntity.save();
+}
+
+export function handleBidAccepted(event: BidAccepted): void {
+  let contract = PCOLicenseDiamond.bind(event.address);
+
+  let pendingBidId =
+    event.params._bidder.toHex() + "-" + contract.licenseId().toHex();
+
+  let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  parcelEntity.currentBid = pendingBidId;
+  parcelEntity.save();
+}
