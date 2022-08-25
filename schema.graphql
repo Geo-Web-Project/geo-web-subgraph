@@ -17,10 +17,10 @@ type Bidder @entity {
 type GeoWebParcel @entity {
   id: ID!
   coordinates: [GeoWebCoordinate!]
-  licenseOwner: Bytes!
-  currentBid: Bid!
+  licenseOwner: Bytes
+  currentBid: Bid
   pendingBid: Bid
-  licenseDiamond: Bytes!
+  licenseDiamond: Bytes
 }
 
 type GeoWebCoordinate @entity {

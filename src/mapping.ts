@@ -168,6 +168,12 @@ export function handleLicenseTransfer(event: Transfer): void {
 
 export function handleBidEvent(event: ethereum.Event): void {
   let contract = PCOLicenseDiamond.bind(event.address);
+
+  let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  if (parcelEntity == null) {
+    parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
+  }
+
   let currentOwnerBidData = contract.currentBid();
 
   let currentOwnerBidId =
@@ -186,6 +192,7 @@ export function handleBidEvent(event: ethereum.Event): void {
   currentOwnerBid.perSecondFeeDenominator =
     currentOwnerBidData.perSecondFeeDenominator;
   currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
+  currentOwnerBid.parcel = parcelEntity.id;
   currentOwnerBid.save();
 
   let currentBidder = Bidder.load(contract.payer().toHex());
@@ -212,6 +219,7 @@ export function handleBidEvent(event: ethereum.Event): void {
   pendingBid.perSecondFeeNumerator = pendingBidData.perSecondFeeNumerator;
   pendingBid.perSecondFeeDenominator = pendingBidData.perSecondFeeDenominator;
   pendingBid.forSalePrice = pendingBidData.forSalePrice;
+  pendingBid.parcel = parcelEntity.id;
   pendingBid.save();
 
   let pendingBidder = Bidder.load(pendingBidData.bidder.toHex());
@@ -222,7 +230,6 @@ export function handleBidEvent(event: ethereum.Event): void {
 
   pendingBidder.save();
 
-  let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
   parcelEntity.pendingBid = pendingBid.id;
   parcelEntity.currentBid = currentOwnerBid.id;
   parcelEntity.save();
