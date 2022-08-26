@@ -207,30 +207,36 @@ export function handleBidEvent(event: ethereum.Event): void {
 
   let pendingBidId =
     pendingBidData.bidder.toHex() + "-" + contract.licenseId().toHex();
-  let pendingBid = Bid.load(pendingBidId);
 
-  if (pendingBid == null) {
-    pendingBid = new Bid(pendingBidId);
+  if (pendingBidId == currentOwnerBidId) {
+    parcelEntity.pendingBid = "";
+  } else {
+    let pendingBid = Bid.load(pendingBidId);
+
+    if (pendingBid == null) {
+      pendingBid = new Bid(pendingBidId);
+    }
+
+    pendingBid.timestamp = pendingBidData.timestamp;
+    pendingBid.bidder = pendingBidData.bidder.toHex();
+    pendingBid.contributionRate = pendingBidData.contributionRate;
+    pendingBid.perSecondFeeNumerator = pendingBidData.perSecondFeeNumerator;
+    pendingBid.perSecondFeeDenominator = pendingBidData.perSecondFeeDenominator;
+    pendingBid.forSalePrice = pendingBidData.forSalePrice;
+    pendingBid.parcel = parcelEntity.id;
+    pendingBid.save();
+
+    let pendingBidder = Bidder.load(pendingBidData.bidder.toHex());
+
+    if (pendingBidder == null) {
+      pendingBidder = new Bidder(pendingBidData.bidder.toHex());
+    }
+
+    pendingBidder.save();
+
+    parcelEntity.pendingBid = pendingBid.id;
   }
 
-  pendingBid.timestamp = pendingBidData.timestamp;
-  pendingBid.bidder = pendingBidData.bidder.toHex();
-  pendingBid.contributionRate = pendingBidData.contributionRate;
-  pendingBid.perSecondFeeNumerator = pendingBidData.perSecondFeeNumerator;
-  pendingBid.perSecondFeeDenominator = pendingBidData.perSecondFeeDenominator;
-  pendingBid.forSalePrice = pendingBidData.forSalePrice;
-  pendingBid.parcel = parcelEntity.id;
-  pendingBid.save();
-
-  let pendingBidder = Bidder.load(pendingBidData.bidder.toHex());
-
-  if (pendingBidder == null) {
-    pendingBidder = new Bidder(pendingBidData.bidder.toHex());
-  }
-
-  pendingBidder.save();
-
-  parcelEntity.pendingBid = pendingBid.id;
   parcelEntity.currentBid = currentOwnerBid.id;
   parcelEntity.save();
 }
@@ -254,5 +260,6 @@ export function handleBidAccepted(event: BidAccepted): void {
 
   let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
   parcelEntity.currentBid = pendingBidId;
+  parcelEntity.pendingBid = null;
   parcelEntity.save();
 }
