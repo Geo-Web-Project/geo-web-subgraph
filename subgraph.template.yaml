@@ -11,7 +11,7 @@ dataSources:
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - GeoWebParcel
@@ -34,7 +34,7 @@ templates:
       abi: PCOLicenseDiamond
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - Bid
@@ -55,4 +55,6 @@ templates:
           handler: handleBidEvent
         - event: TransferTriggered(indexed address,indexed address,indexed address,uint256)
           handler: handleTransferTriggered
+        - event: LicenseReclaimed(indexed address,uint256)
+          handler: handleLicenseReclaimed
       file: ./src/mapping.ts

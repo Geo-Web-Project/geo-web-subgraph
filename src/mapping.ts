@@ -28,6 +28,7 @@ import {
   PCOLicenseDiamond,
   TransferTriggered,
   BidAccepted,
+  LicenseReclaimed,
 } from "../generated/templates/PCOLicenseDiamond/PCOLicenseDiamond";
 
 const GW_MAX_LAT: u32 = (1 << 21) - 1;
@@ -243,6 +244,9 @@ export function handleTransferTriggered(event: TransferTriggered): void {
     event.params._bidder.toHex() + "-" + contract.licenseId().toHex();
 
   let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  if (parcelEntity == null) {
+    parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
+  }
   parcelEntity.currentBid = pendingBidId;
   parcelEntity.save();
 }
@@ -254,7 +258,52 @@ export function handleBidAccepted(event: BidAccepted): void {
     event.params._bidder.toHex() + "-" + contract.licenseId().toHex();
 
   let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  if (parcelEntity == null) {
+    parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
+  }
   parcelEntity.currentBid = pendingBidId;
   parcelEntity.pendingBid = null;
+  parcelEntity.save();
+}
+
+export function handleLicenseReclaimed(event: LicenseReclaimed): void {
+  let contract = PCOLicenseDiamond.bind(event.address);
+
+  let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  if (parcelEntity == null) {
+    parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
+  }
+
+  let currentOwnerBidData = contract.currentBid();
+
+  let currentOwnerBidId =
+    contract.payer().toHex() + "-" + contract.licenseId().toHex();
+  let currentOwnerBid = Bid.load(currentOwnerBidId);
+
+  if (currentOwnerBid == null) {
+    currentOwnerBid = new Bid(currentOwnerBidId);
+  }
+
+  currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
+  currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
+  currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
+  currentOwnerBid.perSecondFeeNumerator =
+    currentOwnerBidData.perSecondFeeNumerator;
+  currentOwnerBid.perSecondFeeDenominator =
+    currentOwnerBidData.perSecondFeeDenominator;
+  currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
+  currentOwnerBid.parcel = parcelEntity.id;
+  currentOwnerBid.save();
+
+  let currentBidder = Bidder.load(contract.payer().toHex());
+
+  if (currentBidder == null) {
+    currentBidder = new Bidder(contract.payer().toHex());
+  }
+
+  currentBidder.save();
+
+  parcelEntity.pendingBid = null;
+  parcelEntity.currentBid = currentOwnerBid.id;
   parcelEntity.save();
 }
