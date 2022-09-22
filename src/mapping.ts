@@ -248,6 +248,7 @@ export function handleTransferTriggered(event: TransferTriggered): void {
     parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
   }
   parcelEntity.currentBid = pendingBidId;
+  parcelEntity.pendingBid = null;
   parcelEntity.save();
 }
 
