@@ -261,6 +261,13 @@ export function handlePayerContributionUpdate(
       currentOwnerBidData.perSecondFeeDenominator;
     currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
     currentOwnerBid.parcel = contract.licenseId().toHex();
+
+    let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+    if (parcelEntity == null) {
+      parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
+    }
+    parcelEntity.currentBid = currentOwnerBid.id;
+    parcelEntity.save();
   }
 
   currentOwnerBid.timestamp = event.block.timestamp;
@@ -290,6 +297,13 @@ export function handlePayerForSalePriceUpdate(
       currentOwnerBidData.perSecondFeeDenominator;
     currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
     currentOwnerBid.parcel = contract.licenseId().toHex();
+
+    let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+    if (parcelEntity == null) {
+      parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
+    }
+    parcelEntity.currentBid = currentOwnerBid.id;
+    parcelEntity.save();
   }
 
   currentOwnerBid.timestamp = event.block.timestamp;
