@@ -50,9 +50,9 @@ templates:
         - event: BidRejected(indexed address,indexed address,uint256)
           handler: handleBidEvent
         - event: PayerContributionRateUpdated(indexed address,int96)
-          handler: handleBidEvent
+          handler: handlePayerContributionUpdate
         - event: PayerForSalePriceUpdated(indexed address,uint256)
-          handler: handleBidEvent
+          handler: handlePayerForSalePriceUpdate
         - event: TransferTriggered(indexed address,indexed address,indexed address,uint256)
           handler: handleTransferTriggered
         - event: LicenseReclaimed(indexed address,uint256)

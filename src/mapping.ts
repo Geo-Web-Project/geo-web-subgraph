@@ -29,6 +29,8 @@ import {
   TransferTriggered,
   BidAccepted,
   LicenseReclaimed,
+  PayerContributionRateUpdated,
+  PayerForSalePriceUpdated,
 } from "../generated/templates/PCOLicenseDiamond/PCOLicenseDiamond";
 
 const GW_MAX_LAT: u32 = (1 << 21) - 1;
@@ -235,6 +237,64 @@ export function handleBidEvent(event: ethereum.Event): void {
   parcelEntity.pendingBid = pendingBid.id;
   parcelEntity.currentBid = currentOwnerBid.id;
   parcelEntity.save();
+}
+
+export function handlePayerContributionUpdate(
+  event: PayerContributionRateUpdated
+): void {
+  let contract = PCOLicenseDiamond.bind(event.address);
+
+  let currentOwnerBidId =
+    event.params._payer.toHex() + "-" + contract.licenseId().toHex();
+  let currentOwnerBid = Bid.load(currentOwnerBidId);
+
+  if (currentOwnerBid == null) {
+    currentOwnerBid = new Bid(currentOwnerBidId);
+
+    let currentOwnerBidData = contract.currentBid();
+    currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
+    currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
+    currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
+    currentOwnerBid.perSecondFeeNumerator =
+      currentOwnerBidData.perSecondFeeNumerator;
+    currentOwnerBid.perSecondFeeDenominator =
+      currentOwnerBidData.perSecondFeeDenominator;
+    currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
+    currentOwnerBid.parcel = contract.licenseId().toHex();
+  }
+
+  currentOwnerBid.timestamp = event.block.timestamp;
+  currentOwnerBid.contributionRate = event.params.contributionRate;
+  currentOwnerBid.save();
+}
+
+export function handlePayerForSalePriceUpdate(
+  event: PayerForSalePriceUpdated
+): void {
+  let contract = PCOLicenseDiamond.bind(event.address);
+
+  let currentOwnerBidId =
+    event.params._payer.toHex() + "-" + contract.licenseId().toHex();
+  let currentOwnerBid = Bid.load(currentOwnerBidId);
+
+  if (currentOwnerBid == null) {
+    currentOwnerBid = new Bid(currentOwnerBidId);
+
+    let currentOwnerBidData = contract.currentBid();
+    currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
+    currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
+    currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
+    currentOwnerBid.perSecondFeeNumerator =
+      currentOwnerBidData.perSecondFeeNumerator;
+    currentOwnerBid.perSecondFeeDenominator =
+      currentOwnerBidData.perSecondFeeDenominator;
+    currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
+    currentOwnerBid.parcel = contract.licenseId().toHex();
+  }
+
+  currentOwnerBid.timestamp = event.block.timestamp;
+  currentOwnerBid.forSalePrice = event.params.forSalePrice;
+  currentOwnerBid.save();
 }
 
 export function handleTransferTriggered(event: TransferTriggered): void {
