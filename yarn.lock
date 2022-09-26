@@ -965,10 +965,10 @@
     "@ethersproject/properties" "^5.6.0"
     "@ethersproject/strings" "^5.6.1"
 
-"@geo-web/contracts@2.4.2":
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/@geo-web/contracts/-/contracts-2.4.2.tgz#29b97f1aaf90a4137faf97808b08dc704c966df4"
-  integrity sha512-UZg9B9UttsK8QQgaHafLLkZB51eKtzT0DNBhsYHVAFsQ48kGeBt/8TGc/0vnt6v0UtPKKwcpa2uJIWn0W8FTMQ==
+"@geo-web/contracts@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@geo-web/contracts/-/contracts-3.0.0.tgz#6ded941b113570f58ca0970091f6e451176cc158"
+  integrity sha512-IPbf/X7kfIlIlWFJF8Y/5h9vBtYW94Su3NnKUcg2P3770+Z9mmBesUXHnMYkdSmNWKo7T/++Gd4Nb72vhmJPHA==
   dependencies:
     "@superfluid-finance/ethereum-contracts" "^1.3.0"
     "@truffle/hdwallet-provider" "^1.1.1"
@@ -977,12 +977,12 @@
     hardhat-diamond-abi "^3.0.1"
     remixd "^0.2.4-alpha.0"
 
-"@geo-web/sdk@^2.4.2":
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/@geo-web/sdk/-/sdk-2.4.2.tgz#4c0f85851511a752341c3b853b1c214bc81b31ac"
-  integrity sha512-m7HKWVQjM+24+c/F0H5Ude5wfL6X0pX3RXH8TM9j6XbtE2VCcPBBzTS73WZ/3Iqmbfu+2Rqdopm8NziXV2FpPA==
+"@geo-web/sdk@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@geo-web/sdk/-/sdk-3.0.0.tgz#c193292cfca4ed2bce1eefaa87fea3fd0e7bf16d"
+  integrity sha512-INDuRkg1Raz0InwlXz1syHdnODgfAm+Sn2ev/cKdZAajnq7hK6O9+61ZvShZgkR+729ZZhdl8t3rIWoYdXZTzw==
   dependencies:
-    "@geo-web/contracts" "2.4.2"
+    "@geo-web/contracts" "3.0.0"
     ethers ">=5.0.0"
     typescript "^4.6.3"
 

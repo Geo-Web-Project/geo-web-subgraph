@@ -33,8 +33,8 @@ import {
   PayerForSalePriceUpdated,
 } from "../generated/templates/PCOLicenseDiamond/PCOLicenseDiamond";
 
-const GW_MAX_LAT: u32 = (1 << 21) - 1;
-const GW_MAX_LON: u32 = (1 << 22) - 1;
+const GW_MAX_LAT: u32 = (1 << 22) - 1;
+const GW_MAX_LON: u32 = (1 << 23) - 1;
 
 export function handleParcelClaimed(event: ParcelClaimed): void {
   // Entities can be loaded from the store using a string ID; this ID
