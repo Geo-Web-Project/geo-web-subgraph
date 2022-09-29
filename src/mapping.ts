@@ -273,6 +273,13 @@ export function handlePayerContributionUpdate(
   currentOwnerBid.timestamp = event.block.timestamp;
   currentOwnerBid.contributionRate = event.params.contributionRate;
   currentOwnerBid.save();
+
+  let currentBidder = Bidder.load(contract.payer().toHex());
+
+  if (currentBidder == null) {
+    currentBidder = new Bidder(contract.payer().toHex());
+    currentBidder.save();
+  }
 }
 
 export function handlePayerForSalePriceUpdate(
@@ -309,6 +316,13 @@ export function handlePayerForSalePriceUpdate(
   currentOwnerBid.timestamp = event.block.timestamp;
   currentOwnerBid.forSalePrice = event.params.forSalePrice;
   currentOwnerBid.save();
+
+  let currentBidder = Bidder.load(contract.payer().toHex());
+
+  if (currentBidder == null) {
+    currentBidder = new Bidder(contract.payer().toHex());
+    currentBidder.save();
+  }
 }
 
 export function handleTransferTriggered(event: TransferTriggered): void {
