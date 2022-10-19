@@ -4,3 +4,6 @@ generated/
 
 local.json
 subgraph.yaml
+
+.envrc
+shell.nix
