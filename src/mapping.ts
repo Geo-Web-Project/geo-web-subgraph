@@ -58,8 +58,6 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
   let bboxN: f64 = F64.NEGATIVE_INFINITY;
   let bboxE: f64 = F64.NEGATIVE_INFINITY;
 
-  let coordIDs = new Array<string>(numPaths * 124);
-
   let currentCoord = <u64>Number.parseInt(parcel.value0.toHex().slice(2), 16);
   let currentPath: u256 = new u256(0);
   let p_i = 0;
@@ -84,7 +82,6 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
     }
 
     saveGWCoord(currentCoord, parcelEntity.id, event);
-    coordIDs[i] = currentCoord.toString();
 
     i += 1;
 
@@ -118,7 +115,6 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
   parcelEntity.bboxS = BigDecimal.fromString(bboxS.toString());
   parcelEntity.bboxE = BigDecimal.fromString(bboxE.toString());
   parcelEntity.bboxW = BigDecimal.fromString(bboxW.toString());
-  parcelEntity.coordinates = coordIDs;
 
   parcelEntity.licenseDiamond = beaconProxy;
 

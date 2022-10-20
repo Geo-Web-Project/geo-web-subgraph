@@ -20,7 +20,7 @@ type GeoWebParcel @entity {
   currentBid: Bid
   pendingBid: Bid
   licenseDiamond: Bytes
-  coordinates: [GeoWebCoordinate!]
+  coordinates: [GeoWebCoordinate!] @derivedFrom(field: "parcel")
   bboxN: BigDecimal
   bboxS: BigDecimal
   bboxE: BigDecimal
