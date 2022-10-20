@@ -14,8 +14,6 @@ import {
 import {
   GeoWebParcel,
   Bidder,
-  GeoWebCoordinate as GWCoord,
-  GeoPoint,
   Bid,
 } from "../generated/schema";
 import {
@@ -53,7 +51,10 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
   let numPaths = parcel.value1.length;
   let paths: BigInt[] = parcel.value1;
 
-  let coordIDs = new Array<string>(numPaths * 124);
+  let bboxS: f64 = F64.POSITIVE_INFINITY;
+  let bboxW: f64 = F64.POSITIVE_INFINITY;
+  let bboxN: f64 = F64.NEGATIVE_INFINITY;
+  let bboxE: f64 = F64.NEGATIVE_INFINITY;
 
   let currentCoord = <u64>Number.parseInt(parcel.value0.toHex().slice(2), 16);
   let currentPath: u256 = new u256(0);
@@ -62,9 +63,26 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
   if (numPaths > 0 && !paths[p_i].isZero()) {
     currentPath = u256.fromUint8ArrayLE(paths[p_i]);
   }
-  do {
-    saveGWCoord(currentCoord, parcelEntity.id, event);
-    coordIDs[i] = currentCoord.toString();
+  do {    
+    let coords = GeoWebCoordinate.to_gps(
+      currentCoord,
+      GW_MAX_LAT,
+      GW_MAX_LON
+    )
+    
+    if (bboxW > coords[0]) {
+      bboxW = coords[0];
+    }
+    if (bboxS > coords[1]) {
+      bboxS = coords[1];
+    }
+    if (bboxE < coords[4]) {
+      bboxE = coords[4];
+    }
+    if (bboxN < coords[5]) {
+      bboxN = coords[5];
+    }
+    
     i += 1;
 
     let hasNext = GeoWebCoordinatePath.hasNext(currentPath);
@@ -93,69 +111,17 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
 
   let beaconProxy = contract.getBeaconProxy(event.params._licenseId);
 
-  parcelEntity.coordinates = coordIDs;
+  parcelEntity.bboxN = BigDecimal.fromString(bboxN.toString());
+  parcelEntity.bboxS = BigDecimal.fromString(bboxS.toString());
+  parcelEntity.bboxE = BigDecimal.fromString(bboxE.toString());
+  parcelEntity.bboxW = BigDecimal.fromString(bboxW.toString());
+  parcelEntity.coordinates = [parcelEntity.bboxW!, parcelEntity.bboxS!, parcelEntity.bboxE!, parcelEntity.bboxS!, parcelEntity.bboxE!, parcelEntity.bboxN!, parcelEntity.bboxW!, parcelEntity.bboxN!, parcelEntity.bboxW!, parcelEntity.bboxS!];
+  
   parcelEntity.licenseDiamond = beaconProxy;
 
   PCOLicenseDiamondTemplate.create(beaconProxy);
 
   parcelEntity.save();
-}
-
-function saveGWCoord(
-  gwCoord: u64,
-  parcelID: string,
-  event: ParcelClaimed
-): void {
-  let entity = GWCoord.load(gwCoord.toString());
-
-  if (entity == null) {
-    entity = new GWCoord(gwCoord.toString());
-  }
-
-  let coords = GeoWebCoordinate.to_gps(
-    gwCoord,
-    GW_MAX_LAT,
-    GW_MAX_LON
-  ).map<BigDecimal>((v: f64) => {
-    return BigDecimal.fromString(v.toString());
-  });
-
-  for (let i = 0; i < coords.length; i += 2) {
-    let lon = coords[i];
-    let lat = coords[i + 1];
-    let coordID = lon.toString() + ";" + lat.toString();
-    let pointEntity = GeoPoint.load(coordID);
-    if (pointEntity == null) {
-      pointEntity = new GeoPoint(coordID);
-    }
-
-    pointEntity.lon = lon;
-    pointEntity.lat = lat;
-
-    switch (i) {
-      case 0:
-        entity.pointBL = pointEntity.id;
-        break;
-      case 2:
-        entity.pointBR = pointEntity.id;
-        break;
-      case 4:
-        entity.pointTR = pointEntity.id;
-        break;
-      case 6:
-        entity.pointTL = pointEntity.id;
-        break;
-    }
-    pointEntity.save();
-  }
-
-  entity.parcel = parcelID;
-  entity.createdAtBlock = event.block.number;
-  let coordX: i32 = GeoWebCoordinate.get_x(gwCoord);
-  let coordY: i32 = GeoWebCoordinate.get_y(gwCoord);
-  entity.coordX = BigInt.fromI32(coordX);
-  entity.coordY = BigInt.fromI32(coordY);
-  entity.save();
 }
 
 export function handleLicenseTransfer(event: Transfer): void {

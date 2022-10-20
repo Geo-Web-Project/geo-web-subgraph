@@ -15,8 +15,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - GeoWebParcel
-        - GeoWebCoordinate
-        - GeoPoint
       abis:
         - name: RegistryDiamond
           file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/RegistryDiamond.json
