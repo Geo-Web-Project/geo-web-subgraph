@@ -15,6 +15,8 @@ import {
   GeoWebParcel,
   Bidder,
   Bid,
+  GeoWebCoordinate as GWCoord,
+  GeoPoint,
 } from "../generated/schema";
 import {
   Transfer,
@@ -56,6 +58,8 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
   let bboxN: f64 = F64.NEGATIVE_INFINITY;
   let bboxE: f64 = F64.NEGATIVE_INFINITY;
 
+  let coordIDs = new Array<string>(numPaths * 124);
+
   let currentCoord = <u64>Number.parseInt(parcel.value0.toHex().slice(2), 16);
   let currentPath: u256 = new u256(0);
   let p_i = 0;
@@ -63,13 +67,9 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
   if (numPaths > 0 && !paths[p_i].isZero()) {
     currentPath = u256.fromUint8ArrayLE(paths[p_i]);
   }
-  do {    
-    let coords = GeoWebCoordinate.to_gps(
-      currentCoord,
-      GW_MAX_LAT,
-      GW_MAX_LON
-    )
-    
+  do {
+    let coords = GeoWebCoordinate.to_gps(currentCoord, GW_MAX_LAT, GW_MAX_LON);
+
     if (bboxW > coords[0]) {
       bboxW = coords[0];
     }
@@ -82,7 +82,10 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
     if (bboxN < coords[5]) {
       bboxN = coords[5];
     }
-    
+
+    saveGWCoord(currentCoord, parcelEntity.id, event);
+    coordIDs[i] = currentCoord.toString();
+
     i += 1;
 
     let hasNext = GeoWebCoordinatePath.hasNext(currentPath);
@@ -115,13 +118,70 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
   parcelEntity.bboxS = BigDecimal.fromString(bboxS.toString());
   parcelEntity.bboxE = BigDecimal.fromString(bboxE.toString());
   parcelEntity.bboxW = BigDecimal.fromString(bboxW.toString());
-  parcelEntity.coordinates = [parcelEntity.bboxW!, parcelEntity.bboxS!, parcelEntity.bboxE!, parcelEntity.bboxS!, parcelEntity.bboxE!, parcelEntity.bboxN!, parcelEntity.bboxW!, parcelEntity.bboxN!, parcelEntity.bboxW!, parcelEntity.bboxS!];
-  
+  parcelEntity.coordinates = coordIDs;
+
   parcelEntity.licenseDiamond = beaconProxy;
 
   PCOLicenseDiamondTemplate.create(beaconProxy);
 
   parcelEntity.save();
+}
+
+function saveGWCoord(
+  gwCoord: u64,
+  parcelID: string,
+  event: ParcelClaimed
+): void {
+  let entity = GWCoord.load(gwCoord.toString());
+
+  if (entity == null) {
+    entity = new GWCoord(gwCoord.toString());
+  }
+
+  let coords = GeoWebCoordinate.to_gps(
+    gwCoord,
+    GW_MAX_LAT,
+    GW_MAX_LON
+  ).map<BigDecimal>((v: f64) => {
+    return BigDecimal.fromString(v.toString());
+  });
+
+  for (let i = 0; i < coords.length; i += 2) {
+    let lon = coords[i];
+    let lat = coords[i + 1];
+    let coordID = lon.toString() + ";" + lat.toString();
+    let pointEntity = GeoPoint.load(coordID);
+    if (pointEntity == null) {
+      pointEntity = new GeoPoint(coordID);
+    }
+
+    pointEntity.lon = lon;
+    pointEntity.lat = lat;
+
+    switch (i) {
+      case 0:
+        entity.pointBL = pointEntity.id;
+        break;
+      case 2:
+        entity.pointBR = pointEntity.id;
+        break;
+      case 4:
+        entity.pointTR = pointEntity.id;
+        break;
+      case 6:
+        entity.pointTL = pointEntity.id;
+        break;
+    }
+    pointEntity.save();
+  }
+
+  entity.parcel = parcelID;
+  entity.createdAtBlock = event.block.number;
+  let coordX: i32 = GeoWebCoordinate.get_x(gwCoord);
+  let coordY: i32 = GeoWebCoordinate.get_y(gwCoord);
+  entity.coordX = BigInt.fromI32(coordX);
+  entity.coordY = BigInt.fromI32(coordY);
+  entity.save();
 }
 
 export function handleLicenseTransfer(event: Transfer): void {

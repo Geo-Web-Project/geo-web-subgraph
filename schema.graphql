@@ -20,9 +20,27 @@ type GeoWebParcel @entity {
   currentBid: Bid
   pendingBid: Bid
   licenseDiamond: Bytes
-  coordinates: [BigDecimal!]
+  coordinates: [GeoWebCoordinate!]
   bboxN: BigDecimal
   bboxS: BigDecimal
   bboxE: BigDecimal
   bboxW: BigDecimal
+}
+
+type GeoWebCoordinate @entity {
+  id: ID!
+  parcel: GeoWebParcel!
+  createdAtBlock: BigInt!
+  coordX: BigInt!
+  coordY: BigInt!
+  pointBL: GeoPoint!
+  pointBR: GeoPoint!
+  pointTR: GeoPoint!
+  pointTL: GeoPoint!
+}
+
+type GeoPoint @entity {
+  id: ID!
+  lon: BigDecimal!
+  lat: BigDecimal!
 }
