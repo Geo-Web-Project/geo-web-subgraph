@@ -17,10 +17,12 @@ dataSources:
         - GeoWebParcel
       abis:
         - name: RegistryDiamond
-          file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/RegistryDiamond.json
+          file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/RegistryDiamondABI.json
       eventHandlers:
         - event: ParcelClaimed(indexed uint256,indexed address)
           handler: handleParcelClaimed
+        - event: ParcelClaimedV2(indexed uint256,indexed address)
+          handler: handleParcelClaimedV2
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleLicenseTransfer
       file: ./src/mapping.ts
@@ -39,7 +41,7 @@ templates:
         - Bidder
       abis:
         - name: PCOLicenseDiamond
-          file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/PCOLicenseDiamond.json
+          file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/PCOLicenseDiamondABI.json
       eventHandlers:
         - event: BidAccepted(indexed address,indexed address,uint256)
           handler: handleBidAccepted
