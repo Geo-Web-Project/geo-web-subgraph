@@ -148,7 +148,7 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
   let lngDim = <u64>Number.parseInt(parcel.value2.toHex().slice(2), 16);
 
   let seCoordinate = swCoordinate;
-  let i: u64 = 0;
+  let i: u64 = 1;
   while (i < lngDim) {
     seCoordinate = GeoWebCoordinate.traverse(
       seCoordinate,
@@ -160,7 +160,7 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
   }
 
   let neCoordinate = seCoordinate;
-  i = 0;
+  i = 1;
   while (i < latDim) {
     neCoordinate = GeoWebCoordinate.traverse(
       neCoordinate,
@@ -172,7 +172,7 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
   }
 
   let nwCoordinate = neCoordinate;
-  i = 0;
+  i = 1;
   while (i < lngDim) {
     nwCoordinate = GeoWebCoordinate.traverse(
       nwCoordinate,
