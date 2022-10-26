@@ -54,7 +54,7 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
   let bboxN: f64 = F64.NEGATIVE_INFINITY;
   let bboxE: f64 = F64.NEGATIVE_INFINITY;
 
-  let currentCoord = <u64>Number.parseInt(parcel.value0.toHex().slice(2), 16);
+  let currentCoord = parcel.value0.toU64();
   let currentPath: u256 = new u256(0);
   let p_i = 0;
   let i = 0;
@@ -143,9 +143,9 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
   let contract = RegistryDiamond.bind(event.address);
   let parcel = contract.getLandParcelV2(event.params._licenseId);
 
-  let swCoordinate = <u64>Number.parseInt(parcel.value0.toHex().slice(2), 16);
-  let latDim = <u64>Number.parseInt(parcel.value1.toHex().slice(2), 16);
-  let lngDim = <u64>Number.parseInt(parcel.value2.toHex().slice(2), 16);
+  let swCoordinate = parcel.value0.toU64();
+  let latDim = parcel.value1.toU64();
+  let lngDim = parcel.value2.toU64();
 
   let seCoordinate = swCoordinate;
   let i: u64 = 1;
@@ -194,6 +194,7 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
     neCoordinate,
     nwCoordinate,
   ];
+
   let a = 0;
   while (a < 4) {
     let coords = GeoWebCoordinate.to_gps(allCoords[a], GW_MAX_LAT, GW_MAX_LON);
