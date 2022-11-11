@@ -43,6 +43,8 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
     parcelEntity = new GeoWebParcel(event.params._licenseId.toHex());
   }
 
+  parcelEntity.createdAtBlock = event.block.number;
+
   let contract = RegistryDiamond.bind(event.address);
   let parcel = contract.getLandParcel(event.params._licenseId);
 
@@ -139,6 +141,8 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
   if (parcelEntity == null) {
     parcelEntity = new GeoWebParcel(event.params._licenseId.toHex());
   }
+
+  parcelEntity.createdAtBlock = event.block.number;
 
   let contract = RegistryDiamond.bind(event.address);
   let parcel = contract.getLandParcelV2(event.params._licenseId);
