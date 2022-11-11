@@ -16,6 +16,7 @@ type Bidder @entity {
 
 type GeoWebParcel @entity {
   id: ID!
+  createdAtBlock: BigInt!
   licenseOwner: Bytes
   currentBid: Bid
   pendingBid: Bid
