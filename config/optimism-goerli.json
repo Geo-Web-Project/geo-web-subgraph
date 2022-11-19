@@ -1,0 +1,5 @@
+{
+  "network": "optimism-goerli",
+  "registryDiamond": "0x08fBdC92C520A6E49F2b7DBd53b56FF8B67e60CE",
+  "startBlock": 2775829
+}

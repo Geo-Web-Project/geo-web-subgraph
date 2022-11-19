@@ -6,4 +6,4 @@ local.json
 subgraph.yaml
 
 .envrc
-shell.nix
+.direnv
