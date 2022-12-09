@@ -17,7 +17,7 @@ dataSources:
         - GeoWebParcel
       abis:
         - name: RegistryDiamond
-          file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/RegistryDiamondABI.json
+          file: ./node_modules/@geo-web/contracts/dist/abi/contracts/registry/interfaces/IRegistryDiamond.sol/IRegistryDiamond.json
       eventHandlers:
         - event: ParcelClaimed(indexed uint256,indexed address)
           handler: handleParcelClaimed
@@ -41,7 +41,7 @@ templates:
         - Bidder
       abis:
         - name: PCOLicenseDiamond
-          file: ./node_modules/@geo-web/contracts/dist/abi/hardhat-diamond-abi/HardhatDiamondABI.sol/PCOLicenseDiamondABI.json
+          file: ./node_modules/@geo-web/contracts/dist/abi/contracts/pco-license/interfaces/IPCOLicenseDiamond.sol/IPCOLicenseDiamond.json
       eventHandlers:
         - event: BidAccepted(indexed address,indexed address,uint256)
           handler: handleBidAccepted

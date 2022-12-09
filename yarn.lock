@@ -650,23 +650,24 @@
     "@ethersproject/properties" "^5.6.0"
     "@ethersproject/strings" "^5.6.0"
 
-"@geo-web/contracts@4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@geo-web/contracts/-/contracts-4.1.0.tgz#2ffbb461ac8559724a7c329dc03d5347942a5edd"
-  integrity sha512-VD1qfriTpbOVUMsVcYQJWHIRQyRiGOCgG8UxqK7tg3r4aWKYRwp0kcixUSEZRlvg6nMpGdEtkipSKji08/gRbA==
+"@geo-web/contracts@4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@geo-web/contracts/-/contracts-4.1.4.tgz#fd5c98df81dce46fa8dff44d33e5173119fafc03"
+  integrity sha512-jLVQNxyxHUaENhOrB+czSVBO4lsMMSyLGpR08vxia2PnuZQFykyzt7sn7PIlvNMcYSxHVCJmwjWGGkIwQJgPAQ==
   dependencies:
-    "@superfluid-finance/ethereum-contracts" "^1.3.0"
+    "@openzeppelin/contracts" "^4.7.0"
+    "@superfluid-finance/ethereum-contracts" "1.3.0"
     "@truffle/hdwallet-provider" "^1.1.1"
     bn.js "^5.1.3"
     date-fns "^2.28.0"
     remixd "^0.2.4-alpha.0"
 
-"@geo-web/sdk@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@geo-web/sdk/-/sdk-4.1.0.tgz#3c94f2a5c673e676105fcbb9b03549a2349bbc6b"
-  integrity sha512-1aHg4yVvIC9ehGi5yMOykLytZz9efJ1erIdwyiyJ7CwyLVWlvCqlbV5b6rjixFYO0ZNBRM+Ku7l7idoUTeKybA==
+"@geo-web/sdk@^4.1.4":
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/@geo-web/sdk/-/sdk-4.1.4.tgz#a1c204725bc930b5d0a169f88f405169e454bccf"
+  integrity sha512-ZPikNQ85LQSFTx4mTd55PHjoVyHmYqQqxlvZ663NAEWp6kHaYI1rwsl0rGB8fWQznJB8D2FOQ40V7/PfQiS7Mw==
   dependencies:
-    "@geo-web/contracts" "4.1.0"
+    "@geo-web/contracts" "4.1.4"
     ethers ">=5.0.0"
     typescript "^4.6.3"
 
@@ -755,6 +756,11 @@
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.5.0.tgz#3fd75d57de172b3743cdfc1206883f56430409cc"
   integrity sha512-fdkzKPYMjrRiPK6K4y64e6GzULR7R7RwxSigHS8DDp7aWDeoReqsQI+cxHV1UuhAqX69L1lAaWDxenfP+xiqzA==
+
+"@openzeppelin/contracts@^4.7.0":
+  version "4.8.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.8.0.tgz#6854c37df205dd2c056bdfa1b853f5d732109109"
+  integrity sha512-AGuwhRRL+NaKx73WKRNzeCxOCOCxpaqF+kp8TJ89QzAipSwZy/NoflkWaL9bywXFRhIzXt8j38sfF7KBKCPWLw==
 
 "@remixproject/plugin-api@0.3.0-beta.5":
   version "0.3.0-beta.5"
@@ -883,10 +889,10 @@
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
-"@superfluid-finance/ethereum-contracts@^1.3.0":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@superfluid-finance/ethereum-contracts/-/ethereum-contracts-1.3.1.tgz#a6e13cdf2ae843f6cc331c137e118e823cb1583d"
-  integrity sha512-4aeeLXuyirK9BqUtidB8ME+/u/UKwULBsEKMshZfMs6h7WO/ALI86O6X02SJi8O5OxM1mneCemDe5dws+Y3qHg==
+"@superfluid-finance/ethereum-contracts@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@superfluid-finance/ethereum-contracts/-/ethereum-contracts-1.3.0.tgz#57f4ba070daae55b0bc16a18cb3e4448850aecbf"
+  integrity sha512-KKeKNHiE2OEO8g+9MebVKsBtNxLn4OrR9YE1hFtJi76Ethx8Myg7xMjiucMyTP+lwORa0iXT75yZUFI89ejT5g==
   dependencies:
     "@decentral.ee/web3-helpers" "0.5.3"
     "@openzeppelin/contracts" "4.5.0"
