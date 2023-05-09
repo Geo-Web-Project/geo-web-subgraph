@@ -28,6 +28,8 @@ import {
   PayerContributionRateUpdated,
   PayerForSalePriceUpdated,
 } from "../generated/templates/PCOLicenseDiamond/PCOLicenseDiamond";
+import { ICFABasePCOV1 } from "../generated/templates/PCOLicenseDiamond/ICFABasePCOV1";
+import { ICFAPenaltyBidV1 } from "../generated/templates/PCOLicenseDiamond/ICFAPenaltyBidV1";
 
 const GW_MAX_LAT: u32 = (1 << 22) - 1;
 const GW_MAX_LON: u32 = (1 << 23) - 1;
@@ -220,6 +222,7 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
   }
 
   let beaconProxy = contract.getBeaconProxy(event.params._licenseId);
+  let pcoLicenseDiamondContract = PCOLicenseDiamond.bind(beaconProxy);
 
   parcelEntity.bboxN = BigDecimal.fromString(bboxN.toString());
   parcelEntity.bboxS = BigDecimal.fromString(bboxS.toString());
@@ -240,6 +243,9 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
 
   parcelEntity.licenseDiamond = beaconProxy;
 
+  let contentHash = pcoLicenseDiamondContract.try_contentHash();
+  parcelEntity.contentHash = contentHash.reverted ? null : contentHash.value;
+
   PCOLicenseDiamondTemplate.create(beaconProxy);
 
   parcelEntity.save();
@@ -258,13 +264,15 @@ export function handleLicenseTransfer(event: Transfer): void {
 
 export function handleBidEvent(event: ethereum.Event): void {
   let contract = PCOLicenseDiamond.bind(event.address);
+  let cfaPcoBase = ICFABasePCOV1.bind(event.address);
+  let cfaPenaltyBid = ICFAPenaltyBidV1.bind(event.address);
 
   let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
   if (parcelEntity == null) {
     parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
   }
 
-  let currentOwnerBidData = contract.currentBid();
+  let currentOwnerBidData = cfaPcoBase.currentBid();
 
   let currentOwnerBidId =
     contract.payer().toHex() + "-" + contract.licenseId().toHex();
@@ -283,6 +291,12 @@ export function handleBidEvent(event: ethereum.Event): void {
     currentOwnerBidData.perSecondFeeDenominator;
   currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
   currentOwnerBid.parcel = parcelEntity.id;
+
+  let currentOwnerBidContentHash = contract.try_contentHash();
+  currentOwnerBid.contentHash = currentOwnerBidContentHash.reverted
+    ? null
+    : currentOwnerBidContentHash.value;
+
   currentOwnerBid.save();
 
   let currentBidder = Bidder.load(contract.payer().toHex());
@@ -293,7 +307,7 @@ export function handleBidEvent(event: ethereum.Event): void {
 
   currentBidder.save();
 
-  let pendingBidData = contract.pendingBid();
+  let pendingBidData = cfaPenaltyBid.pendingBid();
 
   let pendingBidId =
     pendingBidData.bidder.toHex() + "-" + contract.licenseId().toHex();
@@ -311,6 +325,12 @@ export function handleBidEvent(event: ethereum.Event): void {
   pendingBid.perSecondFeeDenominator = pendingBidData.perSecondFeeDenominator;
   pendingBid.forSalePrice = pendingBidData.forSalePrice;
   pendingBid.parcel = parcelEntity.id;
+
+  let pendingBidV2 = contract.try_pendingBid();
+  pendingBid.contentHash = pendingBidV2.reverted
+    ? null
+    : pendingBidV2.value.contentHash;
+
   pendingBid.save();
 
   let pendingBidder = Bidder.load(pendingBidData.bidder.toHex());
@@ -330,6 +350,7 @@ export function handlePayerContributionUpdate(
   event: PayerContributionRateUpdated
 ): void {
   let contract = PCOLicenseDiamond.bind(event.address);
+  let cfaPcoBase = ICFABasePCOV1.bind(event.address);
 
   let currentOwnerBidId =
     event.params._payer.toHex() + "-" + contract.licenseId().toHex();
@@ -338,7 +359,7 @@ export function handlePayerContributionUpdate(
   if (currentOwnerBid == null) {
     currentOwnerBid = new Bid(currentOwnerBidId);
 
-    let currentOwnerBidData = contract.currentBid();
+    let currentOwnerBidData = cfaPcoBase.currentBid();
     currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
     currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
     currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
@@ -348,6 +369,11 @@ export function handlePayerContributionUpdate(
       currentOwnerBidData.perSecondFeeDenominator;
     currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
     currentOwnerBid.parcel = contract.licenseId().toHex();
+
+    let currentOwnerBidContentHash = contract.try_contentHash();
+    currentOwnerBid.contentHash = currentOwnerBidContentHash.reverted
+      ? null
+      : currentOwnerBidContentHash.value;
 
     let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
     if (parcelEntity == null) {
@@ -373,6 +399,7 @@ export function handlePayerForSalePriceUpdate(
   event: PayerForSalePriceUpdated
 ): void {
   let contract = PCOLicenseDiamond.bind(event.address);
+  let cfaPcoBase = ICFABasePCOV1.bind(event.address);
 
   let currentOwnerBidId =
     event.params._payer.toHex() + "-" + contract.licenseId().toHex();
@@ -381,7 +408,7 @@ export function handlePayerForSalePriceUpdate(
   if (currentOwnerBid == null) {
     currentOwnerBid = new Bid(currentOwnerBidId);
 
-    let currentOwnerBidData = contract.currentBid();
+    let currentOwnerBidData = cfaPcoBase.currentBid();
     currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
     currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
     currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
@@ -391,6 +418,11 @@ export function handlePayerForSalePriceUpdate(
       currentOwnerBidData.perSecondFeeDenominator;
     currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
     currentOwnerBid.parcel = contract.licenseId().toHex();
+
+    let currentOwnerBidContentHash = contract.try_contentHash();
+    currentOwnerBid.contentHash = currentOwnerBidContentHash.reverted
+      ? null
+      : currentOwnerBidContentHash.value;
 
     let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
     if (parcelEntity == null) {
@@ -444,13 +476,14 @@ export function handleBidAccepted(event: BidAccepted): void {
 
 export function handleLicenseReclaimed(event: LicenseReclaimed): void {
   let contract = PCOLicenseDiamond.bind(event.address);
+  let cfaPcoBase = ICFABasePCOV1.bind(event.address);
 
   let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
   if (parcelEntity == null) {
     parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
   }
 
-  let currentOwnerBidData = contract.currentBid();
+  let currentOwnerBidData = cfaPcoBase.currentBid();
 
   let currentOwnerBidId =
     contract.payer().toHex() + "-" + contract.licenseId().toHex();
@@ -469,6 +502,12 @@ export function handleLicenseReclaimed(event: LicenseReclaimed): void {
     currentOwnerBidData.perSecondFeeDenominator;
   currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
   currentOwnerBid.parcel = parcelEntity.id;
+
+  let currentOwnerBidContentHash = contract.try_contentHash();
+  currentOwnerBid.contentHash = currentOwnerBidContentHash.reverted
+    ? null
+    : currentOwnerBidContentHash.value;
+
   currentOwnerBid.save();
 
   let currentBidder = Bidder.load(contract.payer().toHex());

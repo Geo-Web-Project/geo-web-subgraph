@@ -18,6 +18,8 @@ dataSources:
       abis:
         - name: RegistryDiamond
           file: ./node_modules/@geo-web/contracts/dist/abi/contracts/registry/interfaces/IRegistryDiamond.sol/IRegistryDiamond.json
+        - name: PCOLicenseDiamond
+          file: ./node_modules/@geo-web/contracts/dist/abi/contracts/pco-license/interfaces/IPCOLicenseDiamond.sol/IPCOLicenseDiamond.json
       eventHandlers:
         - event: ParcelClaimed(indexed uint256,indexed address)
           handler: handleParcelClaimed
@@ -42,6 +44,10 @@ templates:
       abis:
         - name: PCOLicenseDiamond
           file: ./node_modules/@geo-web/contracts/dist/abi/contracts/pco-license/interfaces/IPCOLicenseDiamond.sol/IPCOLicenseDiamond.json
+        - name: ICFABasePCOV1
+          file: ./abi/ICFABasePCOV1.json
+        - name: ICFAPenaltyBidV1
+          file: ./abi/ICFAPenaltyBidV1.json
       eventHandlers:
         - event: BidAccepted(indexed address,indexed address,uint256)
           handler: handleBidAccepted
