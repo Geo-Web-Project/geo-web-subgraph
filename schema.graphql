@@ -7,6 +7,7 @@ type Bid @entity {
   perSecondFeeDenominator: BigInt!
   forSalePrice: BigInt!
   parcel: GeoWebParcel!
+  contentHash: Bytes
 }
 
 type Bidder @entity {
@@ -26,4 +27,5 @@ type GeoWebParcel @entity {
   bboxS: BigDecimal
   bboxE: BigDecimal
   bboxW: BigDecimal
+  contentHash: Bytes
 }
