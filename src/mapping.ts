@@ -385,6 +385,7 @@ export function handlePayerContributionUpdate(
 
   currentOwnerBid.timestamp = event.block.timestamp;
   currentOwnerBid.contributionRate = event.params.contributionRate;
+  currentOwnerBid.bidder = event.params._payer.toHex();
   currentOwnerBid.save();
 
   let currentBidder = Bidder.load(contract.payer().toHex());
