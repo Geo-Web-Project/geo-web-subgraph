@@ -385,11 +385,11 @@ export function handlePayerContributionUpdate(
     event.params._payer.toHex() + "-" + contract.licenseId().toHex();
   let currentOwnerBid = Bid.load(currentOwnerBidId);
 
+  let currentOwnerBidDataV2Res = contract.try_currentBid();
+  let currentOwnerBidDataV1 = cfaPcoBase.currentBid();
+
   if (currentOwnerBid == null) {
     currentOwnerBid = new Bid(currentOwnerBidId);
-
-    let currentOwnerBidDataV2Res = contract.try_currentBid();
-    let currentOwnerBidDataV1 = cfaPcoBase.currentBid();
 
     currentOwnerBid.timestamp = currentOwnerBidDataV2Res.reverted
       ? currentOwnerBidDataV1.timestamp
@@ -410,24 +410,26 @@ export function handlePayerContributionUpdate(
       ? currentOwnerBidDataV1.forSalePrice
       : currentOwnerBidDataV2Res.value.forSalePrice;
     currentOwnerBid.parcel = contract.licenseId().toHex();
-
-    if (currentOwnerBidDataV2Res.reverted) {
-      currentOwnerBid.contentHash = null;
-    } else {
-      currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
-    }
-
-    let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
-    if (parcelEntity == null) {
-      parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
-    }
-    parcelEntity.currentBid = currentOwnerBid.id;
-    parcelEntity.save();
   }
 
+  let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  if (parcelEntity == null) {
+    parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
+  }
+
+  if (currentOwnerBidDataV2Res.reverted) {
+    currentOwnerBid.contentHash = null;
+    parcelEntity.contentHash = null;
+  } else {
+    currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+    parcelEntity.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+  }
   currentOwnerBid.timestamp = event.block.timestamp;
   currentOwnerBid.contributionRate = event.params.contributionRate;
   currentOwnerBid.save();
+
+  parcelEntity.currentBid = currentOwnerBid.id;
+  parcelEntity.save();
 
   let currentBidder = Bidder.load(contract.payer().toHex());
 
@@ -447,11 +449,11 @@ export function handlePayerForSalePriceUpdate(
     event.params._payer.toHex() + "-" + contract.licenseId().toHex();
   let currentOwnerBid = Bid.load(currentOwnerBidId);
 
+  let currentOwnerBidDataV2Res = contract.try_currentBid();
+  let currentOwnerBidDataV1 = cfaPcoBase.currentBid();
+
   if (currentOwnerBid == null) {
     currentOwnerBid = new Bid(currentOwnerBidId);
-
-    let currentOwnerBidDataV2Res = contract.try_currentBid();
-    let currentOwnerBidDataV1 = cfaPcoBase.currentBid();
 
     currentOwnerBid.timestamp = currentOwnerBidDataV2Res.reverted
       ? currentOwnerBidDataV1.timestamp
@@ -472,24 +474,26 @@ export function handlePayerForSalePriceUpdate(
       ? currentOwnerBidDataV1.forSalePrice
       : currentOwnerBidDataV2Res.value.forSalePrice;
     currentOwnerBid.parcel = contract.licenseId().toHex();
-
-    if (currentOwnerBidDataV2Res.reverted) {
-      currentOwnerBid.contentHash = null;
-    } else {
-      currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
-    }
-
-    let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
-    if (parcelEntity == null) {
-      parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
-    }
-    parcelEntity.currentBid = currentOwnerBid.id;
-    parcelEntity.save();
   }
 
+  let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  if (parcelEntity == null) {
+    parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
+  }
+
+  if (currentOwnerBidDataV2Res.reverted) {
+    currentOwnerBid.contentHash = null;
+    parcelEntity.contentHash = null;
+  } else {
+    currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+    parcelEntity.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+  }
   currentOwnerBid.timestamp = event.block.timestamp;
   currentOwnerBid.forSalePrice = event.params.forSalePrice;
   currentOwnerBid.save();
+
+  parcelEntity.currentBid = currentOwnerBid.id;
+  parcelEntity.save();
 
   let currentBidder = Bidder.load(contract.payer().toHex());
 
