@@ -272,8 +272,8 @@ export function handleBidEvent(event: ethereum.Event): void {
     parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
   }
 
-  let currentOwnerBidData = cfaPcoBase.currentBid();
-
+  let currentOwnerBidDataV2Res = contract.try_currentBid();
+  let currentOwnerBidDataV1 = cfaPcoBase.currentBid();
   let currentOwnerBidId =
     contract.payer().toHex() + "-" + contract.licenseId().toHex();
   let currentOwnerBid = Bid.load(currentOwnerBidId);
@@ -282,20 +282,31 @@ export function handleBidEvent(event: ethereum.Event): void {
     currentOwnerBid = new Bid(currentOwnerBidId);
   }
 
-  currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
-  currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
-  currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
-  currentOwnerBid.perSecondFeeNumerator =
-    currentOwnerBidData.perSecondFeeNumerator;
-  currentOwnerBid.perSecondFeeDenominator =
-    currentOwnerBidData.perSecondFeeDenominator;
-  currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
+  currentOwnerBid.timestamp = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.timestamp
+    : currentOwnerBidDataV2Res.value.timestamp;
+  currentOwnerBid.bidder = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.bidder.toHex()
+    : currentOwnerBidDataV2Res.value.bidder.toHex();
+  currentOwnerBid.contributionRate = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.contributionRate
+    : currentOwnerBidDataV2Res.value.contributionRate;
+  currentOwnerBid.perSecondFeeNumerator = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.perSecondFeeNumerator
+    : currentOwnerBidDataV2Res.value.perSecondFeeNumerator;
+  currentOwnerBid.perSecondFeeDenominator = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.perSecondFeeDenominator
+    : currentOwnerBidDataV2Res.value.perSecondFeeDenominator;
+  currentOwnerBid.forSalePrice = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.forSalePrice
+    : currentOwnerBidDataV2Res.value.forSalePrice;
   currentOwnerBid.parcel = parcelEntity.id;
 
-  let currentOwnerBidContentHash = contract.try_contentHash();
-  currentOwnerBid.contentHash = currentOwnerBidContentHash.reverted
-    ? null
-    : currentOwnerBidContentHash.value;
+  if (currentOwnerBidDataV2Res.reverted) {
+    currentOwnerBid.contentHash = null;
+  } else {
+    currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+  }
 
   currentOwnerBid.save();
 
@@ -307,10 +318,15 @@ export function handleBidEvent(event: ethereum.Event): void {
 
   currentBidder.save();
 
-  let pendingBidData = cfaPenaltyBid.pendingBid();
+  let pendingBidDataV2Res = contract.try_pendingBid();
+  let pendingBidDataV1 = cfaPenaltyBid.pendingBid();
 
   let pendingBidId =
-    pendingBidData.bidder.toHex() + "-" + contract.licenseId().toHex();
+    (pendingBidDataV2Res.reverted
+      ? pendingBidDataV1.bidder.toHex()
+      : pendingBidDataV2Res.value.bidder.toHex()) +
+    "-" +
+    contract.licenseId().toHex();
 
   let pendingBid = Bid.load(pendingBidId);
 
@@ -318,25 +334,38 @@ export function handleBidEvent(event: ethereum.Event): void {
     pendingBid = new Bid(pendingBidId);
   }
 
-  pendingBid.timestamp = pendingBidData.timestamp;
-  pendingBid.bidder = pendingBidData.bidder.toHex();
-  pendingBid.contributionRate = pendingBidData.contributionRate;
-  pendingBid.perSecondFeeNumerator = pendingBidData.perSecondFeeNumerator;
-  pendingBid.perSecondFeeDenominator = pendingBidData.perSecondFeeDenominator;
-  pendingBid.forSalePrice = pendingBidData.forSalePrice;
+  pendingBid.timestamp = pendingBidDataV2Res.reverted
+    ? pendingBidDataV1.timestamp
+    : pendingBidDataV2Res.value.timestamp;
+  pendingBid.bidder = pendingBidDataV2Res.reverted
+    ? pendingBidDataV1.bidder.toHex()
+    : pendingBidDataV2Res.value.bidder.toHex();
+  pendingBid.contributionRate = pendingBidDataV2Res.reverted
+    ? pendingBidDataV1.contributionRate
+    : pendingBidDataV2Res.value.contributionRate;
+  pendingBid.perSecondFeeNumerator = pendingBidDataV2Res.reverted
+    ? pendingBidDataV1.perSecondFeeNumerator
+    : pendingBidDataV2Res.value.perSecondFeeNumerator;
+  pendingBid.perSecondFeeDenominator = pendingBidDataV2Res.reverted
+    ? pendingBidDataV1.perSecondFeeDenominator
+    : pendingBidDataV2Res.value.perSecondFeeDenominator;
+  pendingBid.forSalePrice = pendingBidDataV2Res.reverted
+    ? pendingBidDataV1.forSalePrice
+    : pendingBidDataV2Res.value.forSalePrice;
   pendingBid.parcel = parcelEntity.id;
 
-  let pendingBidV2 = contract.try_pendingBid();
-  pendingBid.contentHash = pendingBidV2.reverted
-    ? null
-    : pendingBidV2.value.contentHash;
+  if (pendingBidDataV2Res.reverted) {
+    pendingBid.contentHash = null;
+  } else {
+    pendingBid.contentHash = pendingBidDataV2Res.value.contentHash;
+  }
 
   pendingBid.save();
 
-  let pendingBidder = Bidder.load(pendingBidData.bidder.toHex());
+  let pendingBidder = Bidder.load(pendingBid.bidder);
 
   if (pendingBidder == null) {
-    pendingBidder = new Bidder(pendingBidData.bidder.toHex());
+    pendingBidder = new Bidder(pendingBid.bidder);
   }
 
   pendingBidder.save();
@@ -359,21 +388,34 @@ export function handlePayerContributionUpdate(
   if (currentOwnerBid == null) {
     currentOwnerBid = new Bid(currentOwnerBidId);
 
-    let currentOwnerBidData = cfaPcoBase.currentBid();
-    currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
-    currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
-    currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
-    currentOwnerBid.perSecondFeeNumerator =
-      currentOwnerBidData.perSecondFeeNumerator;
-    currentOwnerBid.perSecondFeeDenominator =
-      currentOwnerBidData.perSecondFeeDenominator;
-    currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
+    let currentOwnerBidDataV2Res = contract.try_currentBid();
+    let currentOwnerBidDataV1 = cfaPcoBase.currentBid();
+
+    currentOwnerBid.timestamp = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.timestamp
+      : currentOwnerBidDataV2Res.value.timestamp;
+    currentOwnerBid.bidder = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.bidder.toHex()
+      : currentOwnerBidDataV2Res.value.bidder.toHex();
+    currentOwnerBid.contributionRate = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.contributionRate
+      : currentOwnerBidDataV2Res.value.contributionRate;
+    currentOwnerBid.perSecondFeeNumerator = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.perSecondFeeNumerator
+      : currentOwnerBidDataV2Res.value.perSecondFeeNumerator;
+    currentOwnerBid.perSecondFeeDenominator = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.perSecondFeeDenominator
+      : currentOwnerBidDataV2Res.value.perSecondFeeDenominator;
+    currentOwnerBid.forSalePrice = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.forSalePrice
+      : currentOwnerBidDataV2Res.value.forSalePrice;
     currentOwnerBid.parcel = contract.licenseId().toHex();
 
-    let currentOwnerBidContentHash = contract.try_contentHash();
-    currentOwnerBid.contentHash = currentOwnerBidContentHash.reverted
-      ? null
-      : currentOwnerBidContentHash.value;
+    if (currentOwnerBidDataV2Res.reverted) {
+      currentOwnerBid.contentHash = null;
+    } else {
+      currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+    }
 
     let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
     if (parcelEntity == null) {
@@ -385,7 +427,6 @@ export function handlePayerContributionUpdate(
 
   currentOwnerBid.timestamp = event.block.timestamp;
   currentOwnerBid.contributionRate = event.params.contributionRate;
-  currentOwnerBid.bidder = event.params._payer.toHex();
   currentOwnerBid.save();
 
   let currentBidder = Bidder.load(contract.payer().toHex());
@@ -409,21 +450,34 @@ export function handlePayerForSalePriceUpdate(
   if (currentOwnerBid == null) {
     currentOwnerBid = new Bid(currentOwnerBidId);
 
-    let currentOwnerBidData = cfaPcoBase.currentBid();
-    currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
-    currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
-    currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
-    currentOwnerBid.perSecondFeeNumerator =
-      currentOwnerBidData.perSecondFeeNumerator;
-    currentOwnerBid.perSecondFeeDenominator =
-      currentOwnerBidData.perSecondFeeDenominator;
-    currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
+    let currentOwnerBidDataV2Res = contract.try_currentBid();
+    let currentOwnerBidDataV1 = cfaPcoBase.currentBid();
+
+    currentOwnerBid.timestamp = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.timestamp
+      : currentOwnerBidDataV2Res.value.timestamp;
+    currentOwnerBid.bidder = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.bidder.toHex()
+      : currentOwnerBidDataV2Res.value.bidder.toHex();
+    currentOwnerBid.contributionRate = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.contributionRate
+      : currentOwnerBidDataV2Res.value.contributionRate;
+    currentOwnerBid.perSecondFeeNumerator = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.perSecondFeeNumerator
+      : currentOwnerBidDataV2Res.value.perSecondFeeNumerator;
+    currentOwnerBid.perSecondFeeDenominator = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.perSecondFeeDenominator
+      : currentOwnerBidDataV2Res.value.perSecondFeeDenominator;
+    currentOwnerBid.forSalePrice = currentOwnerBidDataV2Res.reverted
+      ? currentOwnerBidDataV1.forSalePrice
+      : currentOwnerBidDataV2Res.value.forSalePrice;
     currentOwnerBid.parcel = contract.licenseId().toHex();
 
-    let currentOwnerBidContentHash = contract.try_contentHash();
-    currentOwnerBid.contentHash = currentOwnerBidContentHash.reverted
-      ? null
-      : currentOwnerBidContentHash.value;
+    if (currentOwnerBidDataV2Res.reverted) {
+      currentOwnerBid.contentHash = null;
+    } else {
+      currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+    }
 
     let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
     if (parcelEntity == null) {
@@ -484,7 +538,8 @@ export function handleLicenseReclaimed(event: LicenseReclaimed): void {
     parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
   }
 
-  let currentOwnerBidData = cfaPcoBase.currentBid();
+  let currentOwnerBidDataV2Res = contract.try_currentBid();
+  let currentOwnerBidDataV1 = cfaPcoBase.currentBid();
 
   let currentOwnerBidId =
     contract.payer().toHex() + "-" + contract.licenseId().toHex();
@@ -494,21 +549,31 @@ export function handleLicenseReclaimed(event: LicenseReclaimed): void {
     currentOwnerBid = new Bid(currentOwnerBidId);
   }
 
-  currentOwnerBid.timestamp = currentOwnerBidData.timestamp;
-  currentOwnerBid.bidder = currentOwnerBidData.bidder.toHex();
-  currentOwnerBid.contributionRate = currentOwnerBidData.contributionRate;
-  currentOwnerBid.perSecondFeeNumerator =
-    currentOwnerBidData.perSecondFeeNumerator;
-  currentOwnerBid.perSecondFeeDenominator =
-    currentOwnerBidData.perSecondFeeDenominator;
-  currentOwnerBid.forSalePrice = currentOwnerBidData.forSalePrice;
+  currentOwnerBid.timestamp = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.timestamp
+    : currentOwnerBidDataV2Res.value.timestamp;
+  currentOwnerBid.bidder = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.bidder.toHex()
+    : currentOwnerBidDataV2Res.value.bidder.toHex();
+  currentOwnerBid.contributionRate = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.contributionRate
+    : currentOwnerBidDataV2Res.value.contributionRate;
+  currentOwnerBid.perSecondFeeNumerator = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.perSecondFeeNumerator
+    : currentOwnerBidDataV2Res.value.perSecondFeeNumerator;
+  currentOwnerBid.perSecondFeeDenominator = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.perSecondFeeDenominator
+    : currentOwnerBidDataV2Res.value.perSecondFeeDenominator;
+  currentOwnerBid.forSalePrice = currentOwnerBidDataV2Res.reverted
+    ? currentOwnerBidDataV1.forSalePrice
+    : currentOwnerBidDataV2Res.value.forSalePrice;
   currentOwnerBid.parcel = parcelEntity.id;
 
-  let currentOwnerBidContentHash = contract.try_contentHash();
-  currentOwnerBid.contentHash = currentOwnerBidContentHash.reverted
-    ? null
-    : currentOwnerBidContentHash.value;
-
+  if (currentOwnerBidDataV2Res.reverted) {
+    currentOwnerBid.contentHash = null;
+  } else {
+    currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+  }
   currentOwnerBid.save();
 
   let currentBidder = Bidder.load(contract.payer().toHex());
