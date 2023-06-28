@@ -3,21 +3,21 @@ import {
   Address,
   BigInt,
   BigDecimal,
-  ByteArray,
+  ByteArray
 } from "@graphprotocol/graph-ts";
 import {
   DirectionPath,
   GeoWebCoordinate,
   GeoWebCoordinatePath,
   u256,
-  Direction,
+  Direction
 } from "as-geo-web-coordinate/assembly";
 import { GeoWebParcel, Bidder, Bid } from "../generated/schema";
 import {
   Transfer,
   RegistryDiamond,
   ParcelClaimed,
-  ParcelClaimedV2,
+  ParcelClaimedV2
 } from "../generated/RegistryDiamond/RegistryDiamond";
 import { PCOLicenseDiamond as PCOLicenseDiamondTemplate } from "../generated/templates";
 import {
@@ -27,6 +27,7 @@ import {
   LicenseReclaimed,
   PayerContributionRateUpdated,
   PayerForSalePriceUpdated,
+  PayerContentHashUpdated
 } from "../generated/templates/PCOLicenseDiamond/PCOLicenseDiamond";
 import { ICFABasePCOV1 } from "../generated/templates/PCOLicenseDiamond/ICFABasePCOV1";
 import { ICFAPenaltyBidV1 } from "../generated/templates/PCOLicenseDiamond/ICFAPenaltyBidV1";
@@ -123,7 +124,7 @@ export function handleParcelClaimed(event: ParcelClaimed): void {
     parcelEntity.bboxW!,
     parcelEntity.bboxN!,
     parcelEntity.bboxW!,
-    parcelEntity.bboxS!,
+    parcelEntity.bboxS!
   ];
 
   parcelEntity.licenseDiamond = beaconProxy;
@@ -198,7 +199,7 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
     swCoordinate,
     seCoordinate,
     neCoordinate,
-    nwCoordinate,
+    nwCoordinate
   ];
 
   let a = 0;
@@ -238,7 +239,7 @@ export function handleParcelClaimedV2(event: ParcelClaimedV2): void {
     parcelEntity.bboxW!,
     parcelEntity.bboxN!,
     parcelEntity.bboxW!,
-    parcelEntity.bboxS!,
+    parcelEntity.bboxS!
   ];
 
   parcelEntity.licenseDiamond = beaconProxy;
@@ -501,6 +502,36 @@ export function handlePayerForSalePriceUpdate(
     currentBidder = new Bidder(contract.payer().toHex());
     currentBidder.save();
   }
+}
+
+export function handlePayerContentHashUpdate(
+  event: PayerContentHashUpdated
+): void {
+  let contract = PCOLicenseDiamond.bind(event.address);
+
+  let currentOwnerBidId =
+    event.params._payer.toHex() + "-" + contract.licenseId().toHex();
+  let currentOwnerBid = Bid.load(currentOwnerBidId);
+
+  let currentOwnerBidDataV2Res = contract.try_currentBid();
+
+  if (currentOwnerBid == null) {
+    currentOwnerBid = new Bid(currentOwnerBidId);
+  }
+
+  let parcelEntity = GeoWebParcel.load(contract.licenseId().toHex());
+  if (parcelEntity == null) {
+    parcelEntity = new GeoWebParcel(contract.licenseId().toHex());
+  }
+
+  if (currentOwnerBidDataV2Res.reverted) {
+    currentOwnerBid.contentHash = null;
+    parcelEntity.contentHash = null;
+  } else {
+    currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+    parcelEntity.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+  }
+  currentOwnerBid.save();
 }
 
 export function handleTransferTriggered(event: TransferTriggered): void {

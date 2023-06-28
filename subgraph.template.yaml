@@ -59,6 +59,8 @@ templates:
           handler: handlePayerContributionUpdate
         - event: PayerForSalePriceUpdated(indexed address,uint256)
           handler: handlePayerForSalePriceUpdate
+        - event: PayerContentHashUpdated(indexed address,bytes)
+          handler: handlePayerContentHashUpdate
         - event: TransferTriggered(indexed address,indexed address,indexed address,uint256)
           handler: handleTransferTriggered
         - event: LicenseReclaimed(indexed address,uint256)
