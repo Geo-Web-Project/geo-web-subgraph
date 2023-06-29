@@ -532,6 +532,9 @@ export function handlePayerContentHashUpdate(
     parcelEntity.contentHash = currentOwnerBidDataV2Res.value.contentHash;
   }
   currentOwnerBid.save();
+
+  parcelEntity.currentBid = currentOwnerBid.id;
+  parcelEntity.save();
 }
 
 export function handleTransferTriggered(event: TransferTriggered): void {
