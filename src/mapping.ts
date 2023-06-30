@@ -609,8 +609,10 @@ export function handleLicenseReclaimed(event: LicenseReclaimed): void {
 
   if (currentOwnerBidDataV2Res.reverted) {
     currentOwnerBid.contentHash = null;
+    parcelEntity.contentHash = null;
   } else {
     currentOwnerBid.contentHash = currentOwnerBidDataV2Res.value.contentHash;
+    parcelEntity.contentHash = currentOwnerBidDataV2Res.value.contentHash;
   }
   currentOwnerBid.save();
 
