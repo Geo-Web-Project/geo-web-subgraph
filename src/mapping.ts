@@ -15,6 +15,7 @@ import {
 import { GeoWebParcel, Bidder, Bid } from "../generated/schema";
 import {
   Transfer,
+  TokenURIUpdated,
   RegistryDiamond,
   ParcelClaimed,
   ParcelClaimedV2
@@ -260,6 +261,17 @@ export function handleLicenseTransfer(event: Transfer): void {
   }
 
   entity.licenseOwner = event.params.to;
+  entity.save();
+}
+
+export function handleTokenURIUpdated(event: TokenURIUpdated): void {
+  let entity = GeoWebParcel.load(event.params.tokenId.toHex());
+
+  if (entity == null) {
+    entity = new GeoWebParcel(event.params.tokenId.toHex());
+  }
+
+  entity.tokenURI = event.params.uri;
   entity.save();
 }
 

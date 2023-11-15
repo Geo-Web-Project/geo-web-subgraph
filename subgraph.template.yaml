@@ -27,6 +27,8 @@ dataSources:
           handler: handleParcelClaimedV2
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleLicenseTransfer
+        - event: TokenURIUpdated(indexed uint256,string)
+          handler: handleTokenURIUpdated
       file: ./src/mapping.ts
 templates:
   - kind: ethereum/contract

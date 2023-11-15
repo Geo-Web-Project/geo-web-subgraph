@@ -28,4 +28,5 @@ type GeoWebParcel @entity {
   bboxE: BigDecimal
   bboxW: BigDecimal
   contentHash: Bytes
+  tokenURI: String
 }
