@@ -1,0 +1,5 @@
+{
+  "network": "optimism-sepolia",
+  "registryDiamond": "0x204EFCebEc7F95f89019F64521ee1413B22E5Efe",
+  "startBlock": 6986769
+}

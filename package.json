@@ -5,18 +5,19 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service geo-web-project/geo-web-testnet",
+    "deploy": "graph deploy --studio geo-web-op-sepolia",
     "create-local": "graph create --node http://localhost:8020/ geo-web-project/geo-web-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ geo-web-project/geo-web-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 geo-web-project/geo-web-subgraph",
     "prepare:optimism": "mustache config/optimism.json subgraph.template.yaml > subgraph.yaml",
     "prepare:optimism-goerli": "mustache config/optimism-goerli.json subgraph.template.yaml > subgraph.yaml",
     "prepare:sepolia": "mustache config/sepolia.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:optimism-sepolia": "mustache config/optimism-sepolia.json subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml"
   },
   "dependencies": {
     "@geo-web/sdk": "^4.3.3",
-    "@graphprotocol/graph-cli": "^0.56.0",
+    "@graphprotocol/graph-cli": "^0.67.1",
     "@graphprotocol/graph-ts": "^0.28.1",
     "as-geo-web-coordinate": "^0.7.0",
     "mustache": "^3.1.0"
